@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/0.10.0/Tone.min.js" charset="utf-8"></script>
+    <script src="js/notes.js"></script>
+  </head>
+  <body>
+
+    <script>
+
+        var synth = new Tone.AMSynth().toMaster()
+
+        var elmApp = Elm.Main.fullscreen();
+
+        elmApp.ports.signal.subscribe(function(tone_val){
+            if (tone_val) {
+                synth.triggerAttack(tone_val);
+                console.log(tone_val)
+            } else {
+                synth.triggerRelease();
+            }
+
+        });
+        synth
+
+    </script>
+  </body>
+</html>

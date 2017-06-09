@@ -1,0 +1,9 @@
+.flexcontainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+}
+
+.note {
+    margin: 5px;
+}
