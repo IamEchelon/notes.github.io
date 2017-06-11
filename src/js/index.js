@@ -1,6 +1,8 @@
 var synth = new Tone.AMSynth().toMaster()
 
-var elmApp = Elm.Main.fullscreen();
+
+const node = document.getElementById('note-box');
+const elmApp = Elm.Main.embed(node);
 
 elmApp.ports.signal.subscribe(function (tone_val) {
     if (tone_val) {

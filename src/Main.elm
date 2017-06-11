@@ -88,6 +88,7 @@ view model =
     div []
         [ displayNotes model.notes
         , viewAlertMessage model.alertMessage
+        , viewTransport
         ]
 
 
@@ -104,6 +105,14 @@ viewNote note =
         []
 
 
+viewTransport : Html Msg
+viewTransport =
+    div []
+        [ h4 [] [ text "Controls" ]
+        , p [] [ text "This will be were the controls settings are" ]
+        ]
+
+
 displayNotes : List Note -> Html Msg
 displayNotes notes =
     let
@@ -111,7 +120,9 @@ displayNotes notes =
             notes
                 |> List.map viewNote
     in
-        ol [ Attr.class "flexcontainer ", reversed True ] noteList
+        div [ class "notes" ]
+            [ ol [ class "flexcontainer ", reversed True ] noteList
+            ]
 
 
 viewAlertMessage : Maybe String -> Html Msg
