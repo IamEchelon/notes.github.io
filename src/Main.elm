@@ -2,9 +2,10 @@ port module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes as Attr exposing (..)
-import Html.Events as Event
+import Html.Events as Events
 import Http
 import Json.Decode as Decode exposing (int, string, Decoder, field, succeed)
+import MultiTouch as Touch
 
 
 -- MAIN
@@ -49,16 +50,6 @@ initialModel =
 
 
 -- CSS
-
-
-myStyle : String -> Html.Attribute Msg
-myStyle color =
-    Attr.style
-        [ ( "backgroundColor", color )
-        ]
-
-
-
 -- MESSAGES
 
 
@@ -95,8 +86,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [ Attr.class "text-center" ] [ Html.text "Welcome to Notes" ]
-        , displayNotes model.notes
+        [ displayNotes model.notes
         , viewAlertMessage model.alertMessage
         ]
 
@@ -105,9 +95,11 @@ viewNote : Note -> Html Msg
 viewNote note =
     img
         [ class "note"
+        , draggable "false"
         , src ("images/" ++ (toString note.value) ++ ".svg")
-        , Event.onMouseDown (Trigger note)
-        , Event.onMouseUp (Release note)
+        , Events.onMouseDown (Trigger note)
+        , Events.onMouseLeave (Release note)
+        , Events.onMouseUp (Release note)
         ]
         []
 
