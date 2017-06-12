@@ -21,7 +21,7 @@ var getSynth = (elmValue) => {
     }
 };
 
-// var synth = getSynth('monosynth');
+
 
 // Set and initialize elm constants
 var node = document.getElementById('note-box');
@@ -30,26 +30,25 @@ const elmApp = Elm.Main.embed(node);
 
 
 
-// elmApp.ports.selectSynth.subscribe((chosenSynth) => {
-
-//     var synth1 = getSynth(chosenSynth);
-//     console.log(synth1)
-
-// });
-
-
+var synth = getSynth("duosynth");
 
 // Receive port info from Elm
-elmApp.ports.signal.subscribe((tone_val) => {
+elmApp.ports.toJS.subscribe((tone_val) => {
 
-    var synth = getSynth(tone_val.jssynth);
+    // console.log(tone_val);
 
-    console.log(tone_val)
-    if (tone_val.jsnote) {
-        synth.triggerAttack(tone_val.jsnote);
-        console.log(tone_val.jsnote)
-    } else {
+    if (tone_val.update) {
+        var synth1 = getSynth(tone_val.jssynth);
+        return synth1;
+    }
+
+    console.log(synth1);
+
+    if (tone_val.noteToJS === "") {
         synth.triggerRelease();
+    } else {
+        synth.triggerAttack(tone_val.noteToJS);
+
     }
 
 });

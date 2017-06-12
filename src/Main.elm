@@ -43,6 +43,10 @@ type alias Model =
     }
 
 
+type alias SendJS =
+    { noteToJS : String, synthToJS : String, updateToJS : Bool }
+
+
 initialModel : Model
 initialModel =
     { notes = []
@@ -94,13 +98,19 @@ update msg model =
             ( { model | alertMessage = Just (httpErrorToMessage error) }, Cmd.none )
 
         Trigger note ->
-            ( { model | signal = ("Note Triggered: " ++ note.tone_val) }, signal { jsnote = Just note.tone_val, jssynth = Nothing } )
+            ( { model | signal = note.tone_val }
+            , toJS (SendJS note.tone_val model.instrument False)
+            )
 
         Release note ->
-            ( { model | signal = "Note Released" }, signal { jsnote = Just "", jssynth = Nothing } )
+            ( { model | signal = "" }
+            , toJS (SendJS "" model.instrument False)
+            )
 
         ChooseSound synth ->
-            ( { model | instrument = synth }, signal { jsnote = Nothing, jssynth = Just synth } )
+            ( { model | instrument = synth }
+            , toJS (SendJS "" model.instrument True)
+            )
 
 
 
@@ -170,7 +180,7 @@ viewAlertMessage alertMessage =
 -- EXTERNAL
 
 
-port signal : { jsnote : Maybe String, jssynth : Maybe String } -> Cmd msg
+port toJS : SendJS -> Cmd msg
 
 
 
