@@ -6,6 +6,8 @@ import Html.Events as Events
 import Http
 import Json.Decode as Decode exposing (int, string, Decoder, field, succeed)
 import MultiTouch as Touch
+import Dom.Scroll
+import Task
 
 
 -- MAIN
@@ -37,6 +39,7 @@ type alias Model =
     { notes : List Note
     , alertMessage : Maybe String
     , signal : String
+    , instrument : String
     }
 
 
@@ -45,7 +48,13 @@ initialModel =
     { notes = []
     , alertMessage = Nothing
     , signal = ""
+    , instrument = Maybe.withDefault "" (List.head synthesizers)
     }
+
+
+synthesizers : List String
+synthesizers =
+    [ "duosynth", "fmsynth", "amsynth", "membsynth", "monosynth", "plucksynth" ]
 
 
 
@@ -54,9 +63,11 @@ initialModel =
 
 
 type Msg
-    = GetNotes (Result Http.Error (List Note))
+    = NoOp
+    | GetNotes (Result Http.Error (List Note))
     | Trigger Note
     | Release Note
+    | ChooseSound String
 
 
 
@@ -66,17 +77,30 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        NoOp ->
+            model ! []
+
         GetNotes (Ok dbNotes) ->
-            ( { model | notes = dbNotes }, Cmd.none )
+            let
+                offset =
+                    Dom.Scroll.toY "notes" 400
+
+                scroll =
+                    Dom.Scroll.toY "76" 300
+            in
+                ( { model | notes = dbNotes }, Task.attempt (always NoOp) <| offset )
 
         GetNotes (Err error) ->
             ( { model | alertMessage = Just (httpErrorToMessage error) }, Cmd.none )
 
         Trigger note ->
-            ( { model | signal = ("Note Triggered: " ++ note.tone_val) }, signal note.tone_val )
+            ( { model | signal = ("Note Triggered: " ++ note.tone_val) }, signal { jsnote = Just note.tone_val, jssynth = Nothing } )
 
         Release note ->
-            ( { model | signal = "Note Released" }, signal "" )
+            ( { model | signal = "Note Released" }, signal { jsnote = Just "", jssynth = Nothing } )
+
+        ChooseSound synth ->
+            ( { model | instrument = synth }, signal { jsnote = Nothing, jssynth = Just synth } )
 
 
 
@@ -88,7 +112,7 @@ view model =
     div []
         [ displayNotes model.notes
         , viewAlertMessage model.alertMessage
-        , viewTransport
+        , viewInst model
         ]
 
 
@@ -96,6 +120,7 @@ viewNote : Note -> Html Msg
 viewNote note =
     img
         [ class "note"
+        , id (toString note.value)
         , draggable "false"
         , src ("images/" ++ (toString note.value) ++ ".svg")
         , Events.onMouseDown (Trigger note)
@@ -105,12 +130,17 @@ viewNote note =
         []
 
 
-viewTransport : Html Msg
-viewTransport =
-    div []
-        [ h4 [] [ text "Controls" ]
-        , p [] [ text "This will be were the controls settings are" ]
-        ]
+viewInst : Model -> Html Msg
+viewInst model =
+    let
+        synthOption synth =
+            option [ value synth ] [ text synth ]
+
+        synthOptions =
+            List.map synthOption synthesizers
+    in
+        div []
+            [ select [ Events.onInput ChooseSound ] synthOptions ]
 
 
 displayNotes : List Note -> Html Msg
@@ -120,7 +150,7 @@ displayNotes notes =
             notes
                 |> List.map viewNote
     in
-        div [ class "notes" ]
+        div [ class "notes", id "notes" ]
             [ ol [ class "flexcontainer ", reversed True ] noteList
             ]
 
@@ -140,7 +170,11 @@ viewAlertMessage alertMessage =
 -- EXTERNAL
 
 
-port signal : String -> Cmd msg
+port signal : { jsnote : Maybe String, jssynth : Maybe String } -> Cmd msg
+
+
+
+-- port selectSynth : String -> Cmd msg
 
 
 noteDecoder : Decoder Note
