@@ -61,7 +61,14 @@ initialModel =
 
 synthesizers : List String
 synthesizers =
-    [ "duosynth", "fmsynth", "amsynth", "membsynth", "monosynth", "plucksynth" ]
+    [ "Please Select a Sound-"
+    , "duosynth"
+    , "fmsynth"
+    , "amsynth"
+    , "membsynth"
+    , "monosynth"
+    , "plucksynth"
+    ]
 
 
 
@@ -112,7 +119,7 @@ update msg model =
 
         ChooseSound synth ->
             ( { model | instrument = synth }
-            , Cmd.none
+            , synthToJS synth
             )
 
 
@@ -184,6 +191,9 @@ viewAlertMessage alertMessage =
 
 
 port noteToJS : String -> Cmd msg
+
+
+port synthToJS : String -> Cmd msg
 
 
 
