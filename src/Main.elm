@@ -19,7 +19,7 @@ main =
         { init = ( initialModel, getNotes )
         , view = view
         , update = update
-        , subscriptions = (\_ -> Sub.none)
+        , subscriptions = (always Sub.none)
         }
 
 
@@ -44,7 +44,10 @@ type alias Model =
 
 
 type alias SendJS =
-    { noteToJS : String, synthToJS : String, updateToJS : Bool }
+    { noteToJS : String
+    , synthToJS : String
+    , updateToJS : Bool
+    }
 
 
 initialModel : Model
@@ -99,17 +102,17 @@ update msg model =
 
         Trigger note ->
             ( { model | signal = note.tone_val }
-            , toJS (SendJS note.tone_val model.instrument False)
+            , noteToJS note.tone_val
             )
 
         Release note ->
             ( { model | signal = "" }
-            , toJS (SendJS "" model.instrument False)
+            , noteToJS ""
             )
 
         ChooseSound synth ->
             ( { model | instrument = synth }
-            , toJS (SendJS "" model.instrument True)
+            , Cmd.none
             )
 
 
@@ -180,7 +183,7 @@ viewAlertMessage alertMessage =
 -- EXTERNAL
 
 
-port toJS : SendJS -> Cmd msg
+port noteToJS : String -> Cmd msg
 
 
 

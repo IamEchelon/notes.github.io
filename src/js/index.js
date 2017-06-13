@@ -1,54 +1,53 @@
-var getSynth = (elmValue) => {
-
-    if (elmValue === "duosynth") {
-        return new Tone.DuoSynth().toMaster();
-
-    } else if (elmValue === "fmsynth") {
-        return new Tone.FMSynth().toMaster();
-
-    } else if (elmValue === "membsynth") {
-        return new Tone.MembraneSynth().toMaster();
-
-    } else if (elmValue === "monosynth") {
-        return new Tone.MonoSynth().toMaster();
-
-    } else if (elmValue === "plucksynth") {
-        return new Tone.PluckSynth().toMaster();
-
-    }
-    else if (elmValue === "amsynth") {
-        return new Tone.AMSynth().toMaster();
-    }
-};
-
-
-
 // Set and initialize elm constants
-var node = document.getElementById('note-box');
+
+const node = document.getElementById('note-box');
 
 const elmApp = Elm.Main.embed(node);
 
+var synth;
 
+var chooseSynth;
 
-var synth = getSynth("duosynth");
+// Selects & creates a new instance of tone synthesizer
 
-// Receive port info from Elm
-elmApp.ports.toJS.subscribe((tone_val) => {
-
-    // console.log(tone_val);
-
-    if (tone_val.update) {
-        var synth1 = getSynth(tone_val.jssynth);
-        return synth1;
+chooseSynth = (elmValue) => {
+    console.log(elmValue);
+    switch (elmValue) {
+        case "duosynth":
+            return new Tone.DuoSynth().toMaster();
+            break;
+        case "fmsynth":
+            return new Tone.FMSynth().toMaster();
+            break;
+        case "membsynth":
+            return new Tone.MembraneSynth().toMaster();
+            break;
+        case "monosynth":
+            return new Tone.MonoSynth().toMaster();
+            break;
+        case "plucksynth":
+            return new Tone.PluckSynth().toMaster();
+            break;
+        case "amsynth":
+            return new Tone.AMSynth().toMaster();
+            break;
+        default:
+            console.log("Something has gone horribly awry!");
     }
 
-    console.log(synth1);
+};
 
-    if (tone_val.noteToJS === "") {
+synth = chooseSynth("duosynth");
+
+
+// Receive info from Elm
+
+elmApp.ports.noteToJS.subscribe(function (elmNote) {
+    if (elmNote === "") {
         synth.triggerRelease();
     } else {
-        synth.triggerAttack(tone_val.noteToJS);
+        synth.triggerAttack(elmNote);
 
     }
-
 });
+
