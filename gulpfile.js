@@ -49,6 +49,10 @@ gulp.task('elm', ['elm-init'], () => {
         .pipe(elm.bundle('notes.js', {
             debug: true
         }))
+        .on('error', notify.onError((error) => {
+            return "Message to the notifier: " + error.message;
+        }))
+        .pipe(plumber())
         .pipe(gulp.dest('dist/js/'));
 });
 

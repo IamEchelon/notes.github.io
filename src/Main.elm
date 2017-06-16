@@ -2,9 +2,11 @@ port module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes as Attr exposing (..)
-import Html.Events as Event
+import Html.Events as Events
 import Http
-import Json.Decode as Decode exposing (int, string, Decoder, field, succeed)
+import Json.Decode as Json exposing (int, string, Decoder, field, succeed)
+import Dom.Scroll
+import Task
 
 
 -- MAIN
@@ -16,7 +18,7 @@ main =
         { init = ( initialModel, getNotes )
         , view = view
         , update = update
-        , subscriptions = (\_ -> Sub.none)
+        , subscriptions = (always Sub.none)
         }
 
 
@@ -36,7 +38,14 @@ type alias Model =
     { notes : List Note
     , alertMessage : Maybe String
     , signal : String
+    , instrument : String
+    , feedback : String
     }
+
+
+
+-- type alias TouchNote =
+--     { id : String }
 
 
 initialModel : Model
@@ -44,18 +53,21 @@ initialModel =
     { notes = []
     , alertMessage = Nothing
     , signal = ""
+    , instrument = Maybe.withDefault "" (List.head synthesizers)
+    , feedback = ""
     }
 
 
-
--- CSS
-
-
-myStyle : String -> Html.Attribute Msg
-myStyle color =
-    Attr.style
-        [ ( "backgroundColor", color )
-        ]
+synthesizers : List String
+synthesizers =
+    [ "Select a Sound"
+    , "duosynth"
+    , "fmsynth"
+    , "amsynth"
+    , "membsynth"
+    , "monosynth"
+    , "plucksynth"
+    ]
 
 
 
@@ -63,9 +75,13 @@ myStyle color =
 
 
 type Msg
-    = GetNotes (Result Http.Error (List Note))
+    = NoOp
+    | GetNotes (Result Http.Error (List Note))
     | Trigger Note
     | Release Note
+    | ChooseSound String
+    | TouchNoteOn String
+    | TouchNoteOff String
 
 
 
@@ -75,41 +91,43 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        NoOp ->
+            model ! []
+
         GetNotes (Ok dbNotes) ->
-            ( { model | notes = dbNotes }, Cmd.none )
+            let
+                offset =
+                    Dom.Scroll.toY "notes" 400
+            in
+                ( { model | notes = dbNotes }, Task.attempt (always NoOp) <| offset )
 
         GetNotes (Err error) ->
             ( { model | alertMessage = Just (httpErrorToMessage error) }, Cmd.none )
 
         Trigger note ->
-            ( { model | signal = ("Note Triggered: " ++ note.tone_val) }, signal note.tone_val )
+            ( { model | signal = note.tone_val }
+            , noteToJS note.tone_val
+            )
 
         Release note ->
-            ( { model | signal = "Note Released" }, signal "" )
+            ( { model | signal = "" }
+            , noteToJS ""
+            )
+
+        ChooseSound synth ->
+            ( { model | instrument = synth }
+            , synthToJS synth
+            )
+
+        TouchNoteOn noteID ->
+            ( { model | signal = noteID, feedback = "I was triggered!" }, noteToJS noteID )
+
+        TouchNoteOff noteID ->
+            ( { model | signal = "", feedback = "I am now off :(" }, Cmd.none )
 
 
 
 -- VIEW
-
-
-view : Model -> Html Msg
-view model =
-    div []
-        [ h1 [ Attr.class "text-center" ] [ Html.text "Welcome to Notes" ]
-        , displayNotes model.notes
-        , viewAlertMessage model.alertMessage
-        ]
-
-
-viewNote : Note -> Html Msg
-viewNote note =
-    img
-        [ class "note"
-        , src ("images/" ++ (toString note.value) ++ ".svg")
-        , Event.onMouseDown (Trigger note)
-        , Event.onMouseUp (Release note)
-        ]
-        []
 
 
 displayNotes : List Note -> Html Msg
@@ -119,7 +137,25 @@ displayNotes notes =
             notes
                 |> List.map viewNote
     in
-        ol [ Attr.class "flexcontainer ", reversed True ] noteList
+        div [ class "notes", id "notes" ]
+            [ div [ class "flexcontainer " ] noteList
+            ]
+
+
+viewNote : Note -> Html Msg
+viewNote note =
+    img
+        [ class "note"
+        , id (toString note.value)
+        , draggable "false"
+        , src ("images/" ++ (toString note.value) ++ ".svg")
+        , myCustomHandler "touchstart" TouchNoteOn
+        , myCustomHandler "touchend" TouchNoteOff
+        , Events.onMouseDown <| Trigger note
+        , Events.onMouseLeave <| Release note
+        , Events.onMouseUp <| Release note
+        ]
+        []
 
 
 viewAlertMessage : Maybe String -> Html Msg
@@ -133,20 +169,55 @@ viewAlertMessage alertMessage =
             Html.text ""
 
 
+viewInst : Model -> Html Msg
+viewInst model =
+    let
+        synthOption synth =
+            option [ value synth ] [ text synth ]
+
+        synthOptions =
+            List.map synthOption synthesizers
+    in
+        div []
+            [ select [ Events.onInput ChooseSound ] synthOptions ]
+
+
+view : Model -> Html Msg
+view model =
+    div []
+        [ displayNotes model.notes
+        , viewAlertMessage model.alertMessage
+        , viewInst model
+        ]
+
+
 
 -- EXTERNAL
 
 
-port signal : String -> Cmd msg
+port noteToJS : String -> Cmd msg
+
+
+port synthToJS : String -> Cmd msg
+
+
+myCustomHandler : String -> (String -> Msg) -> Html.Attribute Msg
+myCustomHandler eventType msg =
+    Events.on eventType (Json.map msg targetNoteId)
+
+
+targetNoteId : Json.Decoder String
+targetNoteId =
+    Json.at [ "target", "id" ] Json.string
 
 
 noteDecoder : Decoder Note
 noteDecoder =
-    Decode.map4 Note
-        (field "color" Decode.string)
-        (field "shape" Decode.string)
-        (field "value" Decode.int)
-        (field "tone_val" Decode.string)
+    Json.map4 Note
+        (field "color" Json.string)
+        (field "shape" Json.string)
+        (field "value" Json.int)
+        (field "tone_val" Json.string)
 
 
 getNotes : Cmd Msg
@@ -155,7 +226,7 @@ getNotes =
         notesUrl =
             "https://api.myjson.com/bins/1aojyd"
     in
-        (Decode.list noteDecoder)
+        (Json.list noteDecoder)
             |> Http.get notesUrl
             |> Http.send GetNotes
 
