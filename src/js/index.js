@@ -8,6 +8,7 @@ var synth;
 
 var chooseSynth;
 
+
 // Selects & creates a new instance of tone synthesizer
 
 chooseSynth = (elmValue) => 
@@ -30,8 +31,10 @@ chooseSynth = (elmValue) =>
             
         case "amsynth":
             return new Tone.AMSynth().toMaster();
+
         case "Please Select a Sound-":
             return "None"    
+        
         default:
             console.log("Something has gone horribly awry!");
     }
@@ -56,5 +59,3 @@ elmApp.ports.synthToJS.subscribe( (elmValue) =>
     });
     
 });
-
-
