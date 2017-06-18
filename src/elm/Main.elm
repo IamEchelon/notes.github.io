@@ -7,6 +7,7 @@ import Http
 import Json.Decode as Json exposing (int, string, Decoder, field, succeed)
 import Dom.Scroll
 import Task
+import Shapes exposing (Shape, svgShapes)
 
 
 -- MAIN
@@ -26,11 +27,16 @@ main =
 -- MODEL
 
 
+myShapes =
+    svgShapes
+
+
 type alias Note =
     { color : String
     , shape : String
     , value : Int
     , tone_val : String
+    , hex_val : String
     }
 
 
@@ -144,11 +150,10 @@ displayNotes notes =
 
 viewNote : Note -> Html Msg
 viewNote note =
-    img
+    div
         [ class "note"
         , id (toString note.value)
         , draggable "false"
-        , src ("images/" ++ (toString note.value) ++ ".svg")
         , myCustomHandler "touchstart" TouchNoteOn
         , myCustomHandler "touchend" TouchNoteOff
         , Events.onMouseDown <| Trigger note
@@ -213,18 +218,19 @@ targetNoteId =
 
 noteDecoder : Decoder Note
 noteDecoder =
-    Json.map4 Note
+    Json.map5 Note
         (field "color" Json.string)
         (field "shape" Json.string)
         (field "value" Json.int)
         (field "tone_val" Json.string)
+        (field "hex_value" Json.string)
 
 
 getNotes : Cmd Msg
 getNotes =
     let
         notesUrl =
-            "https://api.myjson.com/bins/1aojyd"
+            "https://api.myjson.com/bins/wibaf"
     in
         (Json.list noteDecoder)
             |> Http.get notesUrl

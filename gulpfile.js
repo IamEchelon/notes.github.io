@@ -45,7 +45,7 @@ gulp.task('image', () => {
 gulp.task('elm-init', elm.init);
 
 gulp.task('elm', ['elm-init'], () => {
-    return gulp.src('src/*.elm')
+    return gulp.src('src/elm/*.elm')
         .pipe(elm.bundle('notes.js', {
             debug: true
         }))
