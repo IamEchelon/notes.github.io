@@ -7,7 +7,7 @@ import Http
 import Json.Decode as Json exposing (int, string, Decoder, field, succeed)
 import Dom.Scroll
 import Task
-import Shapes exposing (Shape, svgShapes)
+import Shapes exposing (..)
 
 
 -- MAIN
@@ -27,15 +27,12 @@ main =
 -- MODEL
 
 
-myShapes =
-    svgShapes
-
-
 type alias Note =
     { color : String
     , shape : String
     , value : Int
     , tone_val : String
+    , svgPath : String
     , hex_val : String
     }
 
@@ -136,15 +133,24 @@ update msg model =
 -- VIEW
 
 
+view : Model -> Html Msg
+view model =
+    div []
+        [ displayNotes model.notes
+        , viewAlertMessage model.alertMessage
+        , viewInst model
+        ]
+
+
 displayNotes : List Note -> Html Msg
 displayNotes notes =
     let
         noteList =
-            notes
-                |> List.map viewNote
+            List.map viewNote notes
     in
         div [ class "notes", id "notes" ]
-            [ div [ class "flexcontainer " ] noteList
+            [ div [ class "flexcontainer " ]
+                noteList
             ]
 
 
@@ -160,7 +166,17 @@ viewNote note =
         , Events.onMouseLeave <| Release note
         , Events.onMouseUp <| Release note
         ]
-        []
+        [ Shapes.makeSvg note.svgPath note.hex_val ]
+
+
+
+-- displaySvg notes =
+--     let
+--         noteList = notes
+--         updatedList note =
+--         List.concatMap (Shapes.svgShapes "#60BB6C") Shapes.svgShapes
+--     in
+--         div [][updatedList]
 
 
 viewAlertMessage : Maybe String -> Html Msg
@@ -187,15 +203,6 @@ viewInst model =
             [ select [ Events.onInput ChooseSound ] synthOptions ]
 
 
-view : Model -> Html Msg
-view model =
-    div []
-        [ displayNotes model.notes
-        , viewAlertMessage model.alertMessage
-        , viewInst model
-        ]
-
-
 
 -- EXTERNAL
 
@@ -218,11 +225,12 @@ targetNoteId =
 
 noteDecoder : Decoder Note
 noteDecoder =
-    Json.map5 Note
+    Json.map6 Note
         (field "color" Json.string)
         (field "shape" Json.string)
         (field "value" Json.int)
         (field "tone_val" Json.string)
+        (field "path" Json.string)
         (field "hex_value" Json.string)
 
 
@@ -230,7 +238,7 @@ getNotes : Cmd Msg
 getNotes =
     let
         notesUrl =
-            "https://api.myjson.com/bins/wibaf"
+            "https://api.myjson.com/bins/u0bbj"
     in
         (Json.list noteDecoder)
             |> Http.get notesUrl
