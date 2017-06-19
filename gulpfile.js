@@ -9,7 +9,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const plumber = require('gulp-plumber');
 const notify = require('gulp-notify');
 const autoprefixer = require('gulp-autoprefixer');
-const image = require('gulp-image');
+// const image = require('gulp-image');
 const audiocontext = require('startaudiocontext');
 
 
@@ -30,17 +30,17 @@ gulp.task('clean', () => {
 
 });
 
-gulp.task('image', () => {
-    gulp.src('src/images/*')
-        .pipe(image({
-            svgo: false
-        }))
-        .on('error', notify.onError((error) => {
-            return "Message to the notifier: " + error.message;
-        }))
-        .pipe(plumber())
-        .pipe(gulp.dest('dist/images'));
-});
+// gulp.task('image', () => {
+//     gulp.src('src/images/*')
+//         .pipe(image({
+//             svgo: false
+//         }))
+//         .on('error', notify.onError((error) => {
+//             return "Message to the notifier: " + error.message;
+//         }))
+//         .pipe(plumber())
+//         .pipe(gulp.dest('dist/images'));
+// });
 
 
 gulp.task('elm-init', elm.init);
@@ -110,4 +110,4 @@ gulp.task('watch', () => {
 // DEFAULT
 
 
-gulp.task('default', ['image', 'stylus', 'elm', 'babel', 'html', 'watch', 'browser-sync']);
+gulp.task('default', ['stylus', 'elm', 'babel', 'html', 'watch', 'browser-sync']);
