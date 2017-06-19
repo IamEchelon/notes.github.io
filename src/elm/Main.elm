@@ -118,10 +118,10 @@ update msg model =
             )
 
         TouchNoteOn noteID ->
-            ( { model | signal = noteID, debuglog = "I was triggered!" }, noteToJS noteID )
+            ( { model | signal = noteID, debuglog = noteID }, noteToJS "C3" )
 
         TouchNoteOff noteID ->
-            ( { model | signal = "", debuglog = "I am now off :(" }, Cmd.none )
+            ( { model | signal = "", debuglog = "I am now off :(" ++ noteID }, Cmd.none )
 
 
 
@@ -156,13 +156,11 @@ viewNote note =
         , id (toString note.value)
         , draggable "false"
         , Events.onMouseDown <| Trigger note
-
-        -- , Events.onMouseEnter <| Trigger note
-        -- , Events.onMouseLeave <| Release note
+        , Events.onMouseEnter <| Trigger note
+        , Events.onMouseLeave <| Release note
         , Events.onMouseUp <| Release note
-
-        -- , myCustomHandler "touchmove" TouchNoteOn
-        -- , myCustomHandler "touchend" TouchNoteOff
+        , myCustomHandler "touchstart" TouchNoteOn
+        , myCustomHandler "touchend" TouchNoteOff
         ]
         [ Shapes.makeSvg note.svgPath note.hex_val ]
 
