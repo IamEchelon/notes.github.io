@@ -42,13 +42,8 @@ type alias Model =
     , alertMessage : Maybe String
     , signal : String
     , instrument : String
-    , feedback : String
+    , debuglog : String
     }
-
-
-
--- type alias TouchNote =
---     { id : String }
 
 
 initialModel : Model
@@ -57,7 +52,7 @@ initialModel =
     , alertMessage = Nothing
     , signal = ""
     , instrument = Maybe.withDefault "" (List.head synthesizers)
-    , feedback = ""
+    , debuglog = ""
     }
 
 
@@ -123,10 +118,10 @@ update msg model =
             )
 
         TouchNoteOn noteID ->
-            ( { model | signal = noteID, feedback = "I was triggered!" }, noteToJS noteID )
+            ( { model | signal = noteID, debuglog = "I was triggered!" }, noteToJS noteID )
 
         TouchNoteOff noteID ->
-            ( { model | signal = "", feedback = "I am now off :(" }, Cmd.none )
+            ( { model | signal = "", debuglog = "I am now off :(" }, Cmd.none )
 
 
 
@@ -160,23 +155,16 @@ viewNote note =
         [ class "note"
         , id (toString note.value)
         , draggable "false"
-        , myCustomHandler "touchstart" TouchNoteOn
-        , myCustomHandler "touchend" TouchNoteOff
         , Events.onMouseDown <| Trigger note
-        , Events.onMouseLeave <| Release note
+
+        -- , Events.onMouseEnter <| Trigger note
+        -- , Events.onMouseLeave <| Release note
         , Events.onMouseUp <| Release note
+
+        -- , myCustomHandler "touchmove" TouchNoteOn
+        -- , myCustomHandler "touchend" TouchNoteOff
         ]
         [ Shapes.makeSvg note.svgPath note.hex_val ]
-
-
-
--- displaySvg notes =
---     let
---         noteList = notes
---         updatedList note =
---         List.concatMap (Shapes.svgShapes "#60BB6C") Shapes.svgShapes
---     in
---         div [][updatedList]
 
 
 viewAlertMessage : Maybe String -> Html Msg

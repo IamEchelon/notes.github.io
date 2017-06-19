@@ -10,6 +10,7 @@ const plumber = require('gulp-plumber');
 const notify = require('gulp-notify');
 const autoprefixer = require('gulp-autoprefixer');
 const image = require('gulp-image');
+const audiocontext = require('startaudiocontext');
 
 
 // Main Tasks
@@ -53,7 +54,8 @@ gulp.task('elm', ['elm-init'], () => {
             return "Message to the notifier: " + error.message;
         }))
         .pipe(plumber())
-        .pipe(gulp.dest('dist/js/'));
+        .pipe(gulp.dest('dist/js/'))
+        .pipe(browserSync.stream());
 });
 
 gulp.task('babel', () => {
