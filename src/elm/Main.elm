@@ -7,6 +7,7 @@ import Http
 import Json.Decode as Json exposing (int, string, Decoder, field, succeed)
 import Dom.Scroll
 import Task
+import Shapes exposing (..)
 
 
 -- MAIN
@@ -31,6 +32,8 @@ type alias Note =
     , shape : String
     , value : Int
     , tone_val : String
+    , svgPath : String
+    , hex_val : String
     }
 
 
@@ -39,13 +42,8 @@ type alias Model =
     , alertMessage : Maybe String
     , signal : String
     , instrument : String
-    , feedback : String
+    , debuglog : String
     }
-
-
-
--- type alias TouchNote =
---     { id : String }
 
 
 initialModel : Model
@@ -54,7 +52,7 @@ initialModel =
     , alertMessage = Nothing
     , signal = ""
     , instrument = Maybe.withDefault "" (List.head synthesizers)
-    , feedback = ""
+    , debuglog = ""
     }
 
 
@@ -120,42 +118,51 @@ update msg model =
             )
 
         TouchNoteOn noteID ->
-            ( { model | signal = noteID, feedback = "I was triggered!" }, noteToJS noteID )
+            ( { model | signal = noteID, debuglog = noteID }, noteToJS "C3" )
 
         TouchNoteOff noteID ->
-            ( { model | signal = "", feedback = "I am now off :(" }, Cmd.none )
+            ( { model | signal = "", debuglog = "I am now off :(" ++ noteID }, Cmd.none )
 
 
 
 -- VIEW
 
 
+view : Model -> Html Msg
+view model =
+    div []
+        [ displayNotes model.notes
+        , viewAlertMessage model.alertMessage
+        , viewInst model
+        ]
+
+
 displayNotes : List Note -> Html Msg
 displayNotes notes =
     let
         noteList =
-            notes
-                |> List.map viewNote
+            List.map viewNote notes
     in
         div [ class "notes", id "notes" ]
-            [ div [ class "flexcontainer " ] noteList
+            [ div [ class "flexcontainer " ]
+                noteList
             ]
 
 
 viewNote : Note -> Html Msg
 viewNote note =
-    img
+    div
         [ class "note"
         , id (toString note.value)
         , draggable "false"
-        , src ("images/" ++ (toString note.value) ++ ".svg")
-        , myCustomHandler "touchstart" TouchNoteOn
-        , myCustomHandler "touchend" TouchNoteOff
         , Events.onMouseDown <| Trigger note
+        , Events.onMouseEnter <| Trigger note
         , Events.onMouseLeave <| Release note
         , Events.onMouseUp <| Release note
+        , myCustomHandler "touchstart" TouchNoteOn
+        , myCustomHandler "touchend" TouchNoteOff
         ]
-        []
+        [ Shapes.makeSvg note.svgPath note.hex_val ]
 
 
 viewAlertMessage : Maybe String -> Html Msg
@@ -182,15 +189,6 @@ viewInst model =
             [ select [ Events.onInput ChooseSound ] synthOptions ]
 
 
-view : Model -> Html Msg
-view model =
-    div []
-        [ displayNotes model.notes
-        , viewAlertMessage model.alertMessage
-        , viewInst model
-        ]
-
-
 
 -- EXTERNAL
 
@@ -213,18 +211,20 @@ targetNoteId =
 
 noteDecoder : Decoder Note
 noteDecoder =
-    Json.map4 Note
+    Json.map6 Note
         (field "color" Json.string)
         (field "shape" Json.string)
         (field "value" Json.int)
         (field "tone_val" Json.string)
+        (field "path" Json.string)
+        (field "hex_value" Json.string)
 
 
 getNotes : Cmd Msg
 getNotes =
     let
         notesUrl =
-            "https://api.myjson.com/bins/1aojyd"
+            "https://api.myjson.com/bins/u0bbj"
     in
         (Json.list noteDecoder)
             |> Http.get notesUrl

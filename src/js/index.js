@@ -8,6 +8,12 @@ var synth;
 
 var chooseSynth;
 
+var context = new AudioContext();
+
+
+// if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) {
+//         $('#unlockIOSModal').modal('show');
+        
 
 // Selects & creates a new instance of tone synthesizer
 
@@ -41,21 +47,25 @@ chooseSynth = (elmValue) =>
 
 };
 
-
+StartAudioContext(Tone.context);
 
 
 // Receive info from Elm
 
 elmApp.ports.synthToJS.subscribe( (elmValue) => 
 {   
+    
     synth = chooseSynth(elmValue);
 
-    elmApp.ports.noteToJS.subscribe( (elmNote) =>
-    { if (elmNote === "")
-    {    synth.triggerRelease();
-    } else 
-    {    synth.triggerAttack(elmNote);
-    }
-    });
+   
+    
+
+        elmApp.ports.noteToJS.subscribe( (elmNote) =>
+        { if (elmNote === "")
+        {    synth.triggerRelease();
+        } else 
+        {    synth.triggerAttack(elmNote);
+        }
+        });
     
 });
