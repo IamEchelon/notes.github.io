@@ -45,17 +45,9 @@ type alias Model =
     , signal : String
     , instrument : String
     , debuglog : String
-    , registertouch : TouchEvent
     , mousedown : Bool
+    , registertouch : TouchEvent
     }
-
-
-type TouchEvent
-    = None
-    | Start Touch.Event
-    | Move Touch.Event
-    | End Touch.Event
-    | Cancel Touch.Event
 
 
 initialModel : Model
@@ -65,8 +57,8 @@ initialModel =
     , signal = ""
     , instrument = Maybe.withDefault "" (List.head synthesizers)
     , debuglog = ""
-    , registertouch = None
     , mousedown = False
+    , registertouch = None
     }
 
 
@@ -86,20 +78,31 @@ synthesizers =
 -- MESSAGES
 
 
+type TouchEvent
+    = None
+    | Start Touch.Event
+    | Move Touch.Event
+    | End Touch.Event
+    | Cancel Touch.Event
+
+
 type Msg
     = NoOp
     | GetNotes (Result Http.Error (List Note))
+    | ChooseSound String
     | MouseDown Note
     | MouseEnter Note
     | MouseLeave
     | MouseUp
-    | ChooseSound String
-      -- | TouchNoteOn String
-      -- | TouchNoteOff String
-    | TouchModel Touch.Event
+    | StartTouch Touch.Event
+    | MoveTouch Touch.Event
+    | EndTouch Touch.Event
+    | CancelTouch Touch.Event
 
 
 
+-- | TouchNoteOn String
+-- | TouchNoteOff String
 -- UPDATE
 
 
@@ -119,7 +122,10 @@ update msg model =
         GetNotes (Err error) ->
             ( { model | alertMessage = Just (httpErrorToMessage error) }, Cmd.none )
 
-        -- Mouse events
+        ChooseSound synth ->
+            ( { model | instrument = synth }, synthToJS synth )
+
+        -- Mouse Events
         MouseDown note ->
             ( { model
                 | signal = note.tone_val
@@ -149,26 +155,33 @@ update msg model =
             , noteToJS ""
             )
 
-        ChooseSound synth ->
-            ( { model | instrument = synth }
-            , synthToJS synth
-            )
+        -- Touch Events
+        StartTouch event ->
+            model ! []
 
-        -- TouchNoteOn noteID ->
-        --     ( { model | signal = noteID, debuglog = noteID }, noteToJS "C3" )
-        -- TouchNoteOff noteID ->
-        --     ( { model | signal = "", debuglog = "I am now off :(" ++ noteID }, Cmd.none )
-        TouchModel event ->
-            ( { model | debuglog = "I have been fondled" ++ (toString event) }, Cmd.none )
+        MoveTouch event ->
+            model ! []
+
+        EndTouch event ->
+            model ! []
+
+        CancelTouch event ->
+            model ! []
 
 
 
+-- TouchModel event ->
+--     ( { model | debuglog = "I have been fondled" ++ (toString event) }, Cmd.none )
+-- TouchNoteOn noteID ->
+--     ( { model | signal = noteID, debuglog = noteID }, noteToJS "C3" )
+-- TouchNoteOff noteID ->
+--     ( { model | signal = "", debuglog = "I am now off :(" ++ noteID }, Cmd.none )
 -- VIEW
 
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ Events.onMouseUp MouseUp ]
         [ displayNotes model.notes
         , viewAlertMessage model.alertMessage
         , viewInst model
@@ -193,11 +206,11 @@ viewNote note =
         [ class "note"
         , id (toString note.value)
         , draggable "false"
-        , MultiTouch.onStart TouchModel
+        , MultiTouch.onStart <| StartTouch
         , Events.onMouseDown <| MouseDown note
         , Events.onMouseEnter <| MouseEnter note
-        , Events.onMouseLeave <| MouseLeave
-        , Events.onMouseUp <| MouseUp
+        , Events.onMouseLeave MouseLeave
+        , Events.onMouseUp MouseUp
         ]
         [ Shapes.makeSvg note.svgPath note.hex_val ]
 
