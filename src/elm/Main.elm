@@ -8,6 +8,8 @@ import Json.Decode as Json exposing (int, string, Decoder, field, succeed)
 import Dom.Scroll
 import Task
 import Shapes exposing (..)
+import Touch
+import MultiTouch exposing (..)
 
 
 -- MAIN
@@ -43,7 +45,17 @@ type alias Model =
     , signal : String
     , instrument : String
     , debuglog : String
+    , registertouch : TouchEvent
+    , mousedown : Bool
     }
+
+
+type TouchEvent
+    = None
+    | Start Touch.Event
+    | Move Touch.Event
+    | End Touch.Event
+    | Cancel Touch.Event
 
 
 initialModel : Model
@@ -53,6 +65,8 @@ initialModel =
     , signal = ""
     , instrument = Maybe.withDefault "" (List.head synthesizers)
     , debuglog = ""
+    , registertouch = None
+    , mousedown = False
     }
 
 
@@ -75,11 +89,14 @@ synthesizers =
 type Msg
     = NoOp
     | GetNotes (Result Http.Error (List Note))
-    | Trigger Note
-    | Release Note
+    | MouseDown Note
+    | MouseEnter Note
+    | MouseLeave
+    | MouseUp
     | ChooseSound String
-    | TouchNoteOn String
-    | TouchNoteOff String
+      -- | TouchNoteOn String
+      -- | TouchNoteOff String
+    | TouchModel Touch.Event
 
 
 
@@ -102,13 +119,33 @@ update msg model =
         GetNotes (Err error) ->
             ( { model | alertMessage = Just (httpErrorToMessage error) }, Cmd.none )
 
-        Trigger note ->
-            ( { model | signal = note.tone_val }
+        -- Mouse events
+        MouseDown note ->
+            ( { model
+                | signal = note.tone_val
+                , mousedown = True
+              }
             , noteToJS note.tone_val
             )
 
-        Release note ->
-            ( { model | signal = "" }
+        MouseEnter note ->
+            if model.mousedown == True then
+                ( { model
+                    | signal = note.tone_val
+                  }
+                , noteToJS note.tone_val
+                )
+            else
+                model ! []
+
+        MouseLeave ->
+            ( { model | signal = "" }, noteToJS "" )
+
+        MouseUp ->
+            ( { model
+                | signal = ""
+                , mousedown = False
+              }
             , noteToJS ""
             )
 
@@ -117,11 +154,12 @@ update msg model =
             , synthToJS synth
             )
 
-        TouchNoteOn noteID ->
-            ( { model | signal = noteID, debuglog = noteID }, noteToJS "C3" )
-
-        TouchNoteOff noteID ->
-            ( { model | signal = "", debuglog = "I am now off :(" ++ noteID }, Cmd.none )
+        -- TouchNoteOn noteID ->
+        --     ( { model | signal = noteID, debuglog = noteID }, noteToJS "C3" )
+        -- TouchNoteOff noteID ->
+        --     ( { model | signal = "", debuglog = "I am now off :(" ++ noteID }, Cmd.none )
+        TouchModel event ->
+            ( { model | debuglog = "I have been fondled" ++ (toString event) }, Cmd.none )
 
 
 
@@ -155,12 +193,11 @@ viewNote note =
         [ class "note"
         , id (toString note.value)
         , draggable "false"
-        , Events.onMouseDown <| Trigger note
-        , Events.onMouseEnter <| Trigger note
-        , Events.onMouseLeave <| Release note
-        , Events.onMouseUp <| Release note
-        , myCustomHandler "touchstart" TouchNoteOn
-        , myCustomHandler "touchend" TouchNoteOff
+        , MultiTouch.onStart TouchModel
+        , Events.onMouseDown <| MouseDown note
+        , Events.onMouseEnter <| MouseEnter note
+        , Events.onMouseLeave <| MouseLeave
+        , Events.onMouseUp <| MouseUp
         ]
         [ Shapes.makeSvg note.svgPath note.hex_val ]
 
@@ -190,6 +227,13 @@ viewInst model =
 
 
 
+-- touchEvents : List (Html.Attribute Msg)
+-- touchEvents =
+--     [ MultiTouch.onStart TouchStart
+--     , MultiTouch.onMove TouchMove
+--     , MultiTouch.onEnd TouchEnd
+--     , MultiTouch.onCancel TouchCancel
+--     ]
 -- EXTERNAL
 
 
