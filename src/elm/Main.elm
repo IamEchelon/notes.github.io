@@ -8,11 +8,10 @@ import Json.Decode as Json exposing (int, string, Decoder, field, succeed)
 import Dom.Scroll
 import Task
 import Shapes exposing (..)
-import Touch
 import MultiTouch exposing (..)
 
 
--- MAIN
+-- Main
 
 
 main : Program Never Model Msg
@@ -26,7 +25,7 @@ main =
 
 
 
--- MODEL
+-- Model
 
 
 type alias Note =
@@ -46,7 +45,7 @@ type alias Model =
     , instrument : String
     , debuglog : String
     , mousedown : Bool
-    , registertouch : TouchEvent
+    , touchEngaged : Bool
     }
 
 
@@ -58,7 +57,7 @@ initialModel =
     , instrument = Maybe.withDefault "" (List.head synthesizers)
     , debuglog = ""
     , mousedown = False
-    , registertouch = None
+    , touchEngaged = False
     }
 
 
@@ -75,15 +74,7 @@ synthesizers =
 
 
 
--- MESSAGES
-
-
-type TouchEvent
-    = None
-    | Start Touch.Event
-    | Move Touch.Event
-    | End Touch.Event
-    | Cancel Touch.Event
+-- Messages
 
 
 type Msg
@@ -94,16 +85,13 @@ type Msg
     | MouseEnter Note
     | MouseLeave
     | MouseUp
-    | StartTouch Touch.Event
-    | MoveTouch Touch.Event
-    | EndTouch Touch.Event
-    | CancelTouch Touch.Event
+    | StartTouch Note
+    | EndTouch Note
+    | CancelTouch Note
 
 
 
--- | TouchNoteOn String
--- | TouchNoteOff String
--- UPDATE
+-- Update
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -127,15 +115,20 @@ update msg model =
 
         -- Mouse Events
         MouseDown note ->
-            ( { model
-                | signal = note.tone_val
-                , mousedown = True
-              }
-            , noteToJS note.tone_val
-            )
+            if model.touchEngaged == True then
+                model ! []
+            else
+                ( { model
+                    | signal = note.tone_val
+                    , mousedown = True
+                  }
+                , noteToJS note.tone_val
+                )
 
         MouseEnter note ->
-            if model.mousedown == True then
+            if model.touchEngaged == True then
+                model ! []
+            else if model.mousedown == True then
                 ( { model
                     | signal = note.tone_val
                   }
@@ -152,37 +145,39 @@ update msg model =
                 | signal = ""
                 , mousedown = False
               }
-            , noteToJS ""
+            , Cmd.none
             )
 
         -- Touch Events
-        StartTouch event ->
-            model ! []
+        StartTouch note ->
+            ( { model
+                | debuglog = "I registered: " ++ note.tone_val
+                , touchEngaged = True
+              }
+            , noteToJS note.tone_val
+            )
 
-        MoveTouch event ->
-            model ! []
+        EndTouch note ->
+            ( { model
+                | debuglog = "Note last touched: " ++ note.tone_val
+                , touchEngaged = False
+              }
+            , noteToJS ""
+            )
 
-        EndTouch event ->
-            model ! []
-
-        CancelTouch event ->
-            model ! []
+        CancelTouch note ->
+            ( model, noteToJS "" )
 
 
 
--- TouchModel event ->
---     ( { model | debuglog = "I have been fondled" ++ (toString event) }, Cmd.none )
--- TouchNoteOn noteID ->
---     ( { model | signal = noteID, debuglog = noteID }, noteToJS "C3" )
--- TouchNoteOff noteID ->
---     ( { model | signal = "", debuglog = "I am now off :(" ++ noteID }, Cmd.none )
--- VIEW
+-- View
 
 
 view : Model -> Html Msg
 view model =
     div [ Events.onMouseUp MouseUp ]
-        [ displayNotes model.notes
+        [ button [ id "playButton", Events.onClick NoOp ] [ text "Start" ]
+        , displayNotes model.notes
         , viewAlertMessage model.alertMessage
         , viewInst model
         ]
@@ -206,7 +201,9 @@ viewNote note =
         [ class "note"
         , id (toString note.value)
         , draggable "false"
-        , MultiTouch.onStart <| StartTouch
+        , MultiTouch.onStart (always <| StartTouch note)
+        , MultiTouch.onEnd (always <| EndTouch note)
+        , MultiTouch.onCancel (always <| CancelTouch note)
         , Events.onMouseDown <| MouseDown note
         , Events.onMouseEnter <| MouseEnter note
         , Events.onMouseLeave MouseLeave
@@ -240,30 +237,13 @@ viewInst model =
 
 
 
--- touchEvents : List (Html.Attribute Msg)
--- touchEvents =
---     [ MultiTouch.onStart TouchStart
---     , MultiTouch.onMove TouchMove
---     , MultiTouch.onEnd TouchEnd
---     , MultiTouch.onCancel TouchCancel
---     ]
--- EXTERNAL
+-- External
 
 
 port noteToJS : String -> Cmd msg
 
 
 port synthToJS : String -> Cmd msg
-
-
-myCustomHandler : String -> (String -> Msg) -> Html.Attribute Msg
-myCustomHandler eventType msg =
-    Events.on eventType (Json.map msg targetNoteId)
-
-
-targetNoteId : Json.Decoder String
-targetNoteId =
-    Json.at [ "target", "id" ] Json.string
 
 
 noteDecoder : Decoder Note
