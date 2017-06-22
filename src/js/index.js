@@ -48,37 +48,45 @@ chooseSynth = (elmValue) =>
 
 
 // Receive info from Elm
-// if (mobile){
-//     elmApp.ports.someSub.subscribe( (val) =>
-//     {
-//         StartAudioContext(Tone.context, '#playButton');
+if( navigator.userAgent.match(/Android/i)
+ || navigator.userAgent.match(/webOS/i)
+ || navigator.userAgent.match(/iPhone/i)
+ || navigator.userAgent.match(/iPad/i))
+ {
+    elmApp.ports.initMobile.subscribe( (val) =>
+    {
+        StartAudioContext(Tone.context, '#playButton');
 
-//         elmApp.ports.synthToJS.subscribe( (elmValue) =>
-//         {
-//             synth = chooseSynth(elmValue);
+        elmApp.ports.synthToJS.subscribe( (elmValue) =>
+        {
+            synth = chooseSynth(elmValue);
 
-//             elmApp.ports.noteToJS.subscribe( (elmNote) =>
-//             { if (elmNote === "")
-//             {    synth.triggerRelease();
-//             } else
-//             {    synth.triggerAttack(elmNote);
-//             }
-//             });
+            elmApp.ports.noteToJS.subscribe( (elmNote) =>
+            { if (elmNote === "")
+            {    synth.triggerRelease();
+            } else
+            {    synth.triggerAttack(elmNote);
+            }
+            });
 
-//         });
-//     });
-// }
-
-elmApp.ports.synthToJS.subscribe( (elmValue) =>
-{
-    synth = chooseSynth(elmValue);
-
-    elmApp.ports.noteToJS.subscribe( (elmNote) =>
-    { if (elmNote === "")
-    {    synth.triggerRelease();
-    } else
-    {    synth.triggerAttack(elmNote);
-    }
+        });
     });
+}
+else
+{
+    elmApp.ports.synthToJS.subscribe( (elmValue) =>
+    {
+        synth = chooseSynth(elmValue);
 
-});
+        elmApp.ports.noteToJS.subscribe( (elmNote) =>
+        { if (elmNote === "")
+        {    synth.triggerRelease();
+        } else
+        {    synth.triggerAttack(elmNote);
+        }
+        });
+
+    });
+}
+
+

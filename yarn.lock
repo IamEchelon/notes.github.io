@@ -3357,6 +3357,10 @@ normalize-range@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/normalize-range/-/normalize-range-0.1.2.tgz#2d10c06bdfd312ea9777695a4d28439456b75942"
 
+normalize-styl@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/normalize-styl/-/normalize-styl-4.1.1.tgz#8e1230f4e1f94ea113fd5772db9776ebe769cadb"
+
 npm-run-path@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/npm-run-path/-/npm-run-path-2.0.2.tgz#35a9232dfa35d7067b4cb2ddf2357b1871536c5f"

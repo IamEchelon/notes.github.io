@@ -176,7 +176,7 @@ update msg model =
             ( model, noteToJS "" )
 
         Clear ->
-            ( { model | modal = True }, Cmd.none )
+            ( { model | modal = True }, initMobile "" )
 
 
 
@@ -188,7 +188,10 @@ view model =
     div [ class "notesBody", Events.onMouseUp MouseUp ]
         [ div [ classList [ ( "modal", True ), ( "hide", model.modal ) ] ]
             [ button
-                [ classList [ ( "hide", model.modal ) ], id "playButton", Events.onClick Clear ]
+                [ classList [ ( "hide", model.modal ) ]
+                , id "playButton"
+                , Events.onClick Clear
+                ]
                 [ text "Start" ]
             ]
         , instrument model
@@ -216,11 +219,7 @@ htmlKeys notes =
         noteList =
             List.map htmlNote notes
     in
-        div [ class "htmlKeys", id "notes" ]
-            [ div
-                [ class "flexcontainer " ]
-                noteList
-            ]
+        div [ class "htmlKeys", id "notes" ] noteList
 
 
 htmlNote : Note -> Html Msg
@@ -268,6 +267,9 @@ apiAlertMessage alertMessage =
 
 
 -- External
+
+
+port initMobile : String -> Cmd msg
 
 
 port noteToJS : String -> Cmd msg
