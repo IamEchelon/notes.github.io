@@ -11,61 +11,82 @@ var chooseSynth;
 var context = new AudioContext();
 
 
-// if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) {
-//         $('#unlockIOSModal').modal('show');
-        
 
 // Selects & creates a new instance of tone synthesizer
 
-chooseSynth = (elmValue) => 
-{   switch (elmValue) 
-    {    
+chooseSynth = (elmValue) =>
+{   switch (elmValue)
+    {
         case "duosynth":
             return new Tone.DuoSynth().toMaster();
 
         case "fmsynth":
             return new Tone.FMSynth().toMaster();
-      
+
         case "membsynth":
             return new Tone.MembraneSynth().toMaster();
-            
+
         case "monosynth":
             return new Tone.MonoSynth().toMaster();
-            
+
         case "plucksynth":
             return new Tone.PluckSynth().toMaster();
-            
+
         case "amsynth":
             return new Tone.AMSynth().toMaster();
 
         case "Please Select a Sound-":
-            return "None"    
-        
+            return "None"
+
         default:
             console.log("Something has gone horribly awry!");
     }
 
 };
 
-StartAudioContext(Tone.context);
+
 
 
 // Receive info from Elm
+if( navigator.userAgent.match(/Android/i)
+ || navigator.userAgent.match(/webOS/i)
+ || navigator.userAgent.match(/iPhone/i)
+ || navigator.userAgent.match(/iPad/i))
+ {
+    elmApp.ports.initMobile.subscribe( (val) =>
+    {
+        StartAudioContext(Tone.context, '#playButton');
 
-elmApp.ports.synthToJS.subscribe( (elmValue) => 
-{   
-    
-    synth = chooseSynth(elmValue);
+        elmApp.ports.synthToJS.subscribe( (elmValue) =>
+        {
+            synth = chooseSynth(elmValue);
 
-   
-    
+            elmApp.ports.noteToJS.subscribe( (elmNote) =>
+            { if (elmNote === "")
+            {    synth.triggerRelease();
+            } else
+            {    synth.triggerAttack(elmNote);
+            }
+            });
+
+        });
+    });
+}
+else
+{
+    elmApp.ports.synthToJS.subscribe( (elmValue) =>
+    {
+        synth = chooseSynth(elmValue);
 
         elmApp.ports.noteToJS.subscribe( (elmNote) =>
         { if (elmNote === "")
         {    synth.triggerRelease();
-        } else 
+        } else
         {    synth.triggerAttack(elmNote);
         }
         });
-    
-});
+
+    });
+}
+
+

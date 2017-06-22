@@ -20,8 +20,8 @@ makeSvg : Path -> Fill -> Html msg
 makeSvg shapePath color =
     svg
         [ version "1.1"
-        , x "0"
-        , y "0"
+        , x "30"
+        , y "30"
         , viewBox "0 0 174 200"
         ]
         [ Svg.path
