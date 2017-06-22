@@ -28,6 +28,8 @@ main =
 -- Model
 
 
+{-| The core building block of our app. Each note in this notation system must be initialized with a a shape, a color, and numeric value that represents MIDI output
+-}
 type alias Note =
     { color : String
     , shape : String
@@ -46,6 +48,7 @@ type alias Model =
     , debuglog : String
     , mousedown : Bool
     , touchEngaged : Bool
+    , modal : Bool
     }
 
 
@@ -58,9 +61,12 @@ initialModel =
     , debuglog = ""
     , mousedown = False
     , touchEngaged = False
+    , modal = False
     }
 
 
+{-| A list of selectable music instruments within Tone JS
+-}
 synthesizers : List String
 synthesizers =
     [ "Select a Sound"
@@ -88,6 +94,7 @@ type Msg
     | StartTouch Note
     | EndTouch Note
     | CancelTouch Note
+    | Clear
 
 
 
@@ -145,7 +152,7 @@ update msg model =
                 | signal = ""
                 , mousedown = False
               }
-            , Cmd.none
+            , noteToJS ""
             )
 
         -- Touch Events
@@ -168,6 +175,9 @@ update msg model =
         CancelTouch note ->
             ( model, noteToJS "" )
 
+        Clear ->
+            ( { model | modal = True }, Cmd.none )
+
 
 
 -- View
@@ -175,32 +185,49 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ Events.onMouseUp MouseUp ]
-        [ button [ id "playButton", Events.onClick NoOp ] [ text "Start" ]
-        , displayNotes model.notes
-        , viewAlertMessage model.alertMessage
-        , viewInst model
+    div [ class "notesBody", Events.onMouseUp MouseUp ]
+        [ div [ classList [ ( "modal", True ), ( "hide", model.modal ) ] ]
+            [ button
+                [ classList [ ( "hide", model.modal ) ], id "playButton", Events.onClick Clear ]
+                [ text "Start" ]
+            ]
+        , instrument model
+        , apiAlertMessage model.alertMessage
         ]
 
 
-displayNotes : List Note -> Html Msg
-displayNotes notes =
+{-| Creates a container for all components that create our instrument functionality
+-}
+instrument : Model -> Html Msg
+instrument model =
+    div [ class "instrument" ]
+        [ htmlKeys model.notes
+        , div
+            [ class "panel" ]
+            [ selectSynth model ]
+        ]
+
+
+{-| Takes a note list and maps the values with our htmlNote below
+-}
+htmlKeys : List Note -> Html Msg
+htmlKeys notes =
     let
         noteList =
-            List.map viewNote notes
+            List.map htmlNote notes
     in
-        div [ class "notes", id "notes" ]
-            [ div [ class "flexcontainer " ]
+        div [ class "htmlKeys", id "notes" ]
+            [ div
+                [ class "flexcontainer " ]
                 noteList
             ]
 
 
-viewNote : Note -> Html Msg
-viewNote note =
+htmlNote : Note -> Html Msg
+htmlNote note =
     div
-        [ class "note"
+        [ class "htmlNote"
         , id (toString note.value)
-        , draggable "false"
         , MultiTouch.onStart (always <| StartTouch note)
         , MultiTouch.onEnd (always <| EndTouch note)
         , MultiTouch.onCancel (always <| CancelTouch note)
@@ -212,19 +239,8 @@ viewNote note =
         [ Shapes.makeSvg note.svgPath note.hex_val ]
 
 
-viewAlertMessage : Maybe String -> Html Msg
-viewAlertMessage alertMessage =
-    case alertMessage of
-        Just message ->
-            div []
-                [ Html.text message ]
-
-        Nothing ->
-            Html.text ""
-
-
-viewInst : Model -> Html Msg
-viewInst model =
+selectSynth : Model -> Html Msg
+selectSynth model =
     let
         synthOption synth =
             option [ value synth ] [ text synth ]
@@ -232,8 +248,22 @@ viewInst model =
         synthOptions =
             List.map synthOption synthesizers
     in
-        div []
-            [ select [ Events.onInput ChooseSound ] synthOptions ]
+        div [ class "selectSynth" ]
+            [ select
+                [ Events.onInput ChooseSound ]
+                synthOptions
+            ]
+
+
+apiAlertMessage : Maybe String -> Html Msg
+apiAlertMessage alertMessage =
+    case alertMessage of
+        Just message ->
+            div []
+                [ Html.text message ]
+
+        Nothing ->
+            Html.text ""
 
 
 
@@ -246,6 +276,8 @@ port noteToJS : String -> Cmd msg
 port synthToJS : String -> Cmd msg
 
 
+{-| Parses our JSON data to setup each note
+-}
 noteDecoder : Decoder Note
 noteDecoder =
     Json.map6 Note
@@ -257,6 +289,8 @@ noteDecoder =
         (field "hex_value" Json.string)
 
 
+{-| Calls to the JSON api to retrieve our note values from a simple database
+-}
 getNotes : Cmd Msg
 getNotes =
     let
