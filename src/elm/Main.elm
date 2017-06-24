@@ -211,21 +211,28 @@ instrument model =
         ]
 
 
+
+-- addClass : Model -> List -> Html Msg
+-- addClass model noteList =
+--     List.map (\a -> classList [ ( "htmlNote", True ), ( "keydown", model.mousedown ) ] :: a) noteList
+
+
 {-| Takes a note list and maps the values with our htmlNote below
 -}
 htmlKeys : List Note -> Html Msg
-htmlKeys notes =
+htmlKeys notesList =
     let
-        noteList =
-            List.map htmlNote notes
+        htmlNotes =
+            notesList
+                |> List.map htmlNote
     in
-        div [ class "htmlKeys", id "notes" ] noteList
+        div [ class "htmlKeys", id "notes" ] htmlNotes
 
 
 htmlNote : Note -> Html Msg
 htmlNote note =
     div
-        [ class "htmlNote"
+        [ classList [ ( "htmlNote", True ), ( "keydown", False ) ]
         , id (toString note.value)
         , MultiTouch.onStart (always <| StartTouch note)
         , MultiTouch.onEnd (always <| EndTouch note)

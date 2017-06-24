@@ -14,11 +14,11 @@ var context = new AudioContext();
 
 // Selects & creates a new instance of tone synthesizer
 
-chooseSynth = (elmValue) =>
-{   switch (elmValue)
-    {
+chooseSynth = (elmValue) => {
+    switch (elmValue) {
         case "duosynth":
-            return new Tone.DuoSynth().toMaster();
+            var limiter = new Tone.Limiter(-14);
+            return new Tone.DuoSynth().connect(limiter).toMaster();
 
         case "fmsynth":
             return new Tone.FMSynth().toMaster();
@@ -48,42 +48,52 @@ chooseSynth = (elmValue) =>
 
 
 // Receive info from Elm
-if( navigator.userAgent.match(/Android/i)
- || navigator.userAgent.match(/webOS/i)
- || navigator.userAgent.match(/iPhone/i)
- || navigator.userAgent.match(/iPad/i))
- {
-    elmApp.ports.initMobile.subscribe( (val) =>
-    {
+if (navigator.userAgent.match(/Android/i)
+    || navigator.userAgent.match(/webOS/i)
+    || navigator.userAgent.match(/iPhone/i)
+    || navigator.userAgent.match(/iPad/i)) {
+    
+    elmApp.ports.initMobile.subscribe((val) => {
+        
         StartAudioContext(Tone.context, '#playButton');
 
-        elmApp.ports.synthToJS.subscribe( (elmValue) =>
-        {
+        
+        elmApp.ports.synthToJS.subscribe((elmValue) => {
+
             synth = chooseSynth(elmValue);
 
-            elmApp.ports.noteToJS.subscribe( (elmNote) =>
-            { if (elmNote === "")
-            {    synth.triggerRelease();
-            } else
-            {    synth.triggerAttack(elmNote);
-            }
-            });
+            var limiter = new Tone.Limiter(-6);
+
+            
+            elmApp.ports.noteToJS.subscribe((elmNote) => {
+                
+                if (elmNote === "") {
+                    synth.triggerRelease();
+                } else {
+                    synth.triggerAttack(elmNote);
+                }
+           
+         });
 
         });
     });
-}
-else
-{
-    elmApp.ports.synthToJS.subscribe( (elmValue) =>
-    {
+
+}else {
+
+    elmApp.ports.synthToJS.subscribe((elmValue) => {
+
         synth = chooseSynth(elmValue);
 
-        elmApp.ports.noteToJS.subscribe( (elmNote) =>
-        { if (elmNote === "")
-        {    synth.triggerRelease();
-        } else
-        {    synth.triggerAttack(elmNote);
-        }
+        var limiter = new Tone.Limiter(-6);
+
+        
+        elmApp.ports.noteToJS.subscribe((elmNote) => {
+
+            if (elmNote === "") {
+                synth.triggerRelease();
+            } else {
+                synth.triggerAttack(elmNote);
+            }
         });
 
     });
