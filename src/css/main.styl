@@ -1,32 +1,49 @@
+// Constants
+
 $panelColor = #D8D8D8
 
-// $cap-y-scale: tan(30deg)
-// $cap-height = (150/2) * tan(30deg)
-// $half-x-spacing = 4 / 2
-// $y-spacing = $half-x-spacing * math(2, "sqrt")
+$gridpixel = 2
+
+$half-x-spacing()
+    ( $gridpixel / 2)px
+
+
+// Unused helper functions for positioning hexagon grid
+
+// $sqrRt = math(3, "sqrt")
+// $tan = tan(30deg)
+// $y-spacing()
+//     ($half-x-spacing() * $sqrrt )px
+// $cap-height()
+//     ((150/2) * $tan)px
+
+
+
 // Shape Key Panel Styles
 
 .htmlKeys
-    width: 43%
+    min-width: 43%
+    max-width: 43%
     display: flex
     flex-direction: row
     flex-wrap: wrap-reverse
     align-content: center
     margin: auto
     padding-bottom: 220px
+    margin-top: 30px
 
-.htmlKeys .htmlNote:nth-child(12n + 7){
-    margin-left: 75px;
+.htmlKeys .htmlNote:nth-child(12n + 7)
+    margin-left: 77px
 
-    
-}
-    
+.htmlKeys .htmlNote:nth-child(12n + 1)
+    margin-right: 0px
+
 
 .htmlNote
     cursor: pointer
     width: 150px
-    margin-bottom: -46px
-    // margin: unit( $cap-height ,'px') $half-x-spacing $y-spacing
+    // margin-bottom: -46px
+    margin: -22.5px $half-x-spacing() 
 
 
 
