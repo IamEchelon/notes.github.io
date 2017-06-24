@@ -25,7 +25,8 @@ makeSvg shapePath color =
         , viewBox "0 0 174 200"
         ]
         [ Svg.path
-            [ d shapePath
+            [ id "hex"
+            , d shapePath
             , fill color
             ]
             [ g [ fillRule "evenodd" ] [] ]
