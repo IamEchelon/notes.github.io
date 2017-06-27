@@ -44,6 +44,26 @@ $half-x-spacing()
     width: 150px
     // margin-bottom: -46px
     margin: -22.5px $half-x-spacing() 
+    transition: all 100ms ease-in;
+    transform: scale(1)
+    animation: bounce 1s infinite alternate;
+
+// @keyframes bounce {
+//   from {
+//     transform: translateY(0px);
+//   }
+//   to {
+//     transform: translateY(-15px);
+//   }
+// }
+
+.htmlNote:active
+    transition: all 100ms ease-in;
+    transform: scale(.80)
+
+// .keydown
+//     transition: all 100ms ease-in;
+//     transform: scale(.80)
 
 
 
