@@ -4,10 +4,10 @@ import Html exposing (..)
 import Html.Attributes as Attr exposing (..)
 import Html.Events as Events
 import Http
-import Json.Decode as Json exposing (int, string, Decoder, field, succeed)
+import Json.Decode as ReadJson exposing (int, string, Decoder, field, succeed)
 import Dom.Scroll
 import Task
-import Shapes exposing (..)
+import Shapes exposing (makeSvg)
 import MultiTouch exposing (..)
 
 
@@ -49,6 +49,7 @@ type alias Model =
     , mousedown : Bool
     , touchEngaged : Bool
     , modal : Bool
+    , animate : Bool
     }
 
 
@@ -62,6 +63,7 @@ initialModel =
     , mousedown = False
     , touchEngaged = False
     , modal = False
+    , animate = False
     }
 
 
@@ -128,6 +130,7 @@ update msg model =
                 ( { model
                     | signal = note.tone_val
                     , mousedown = True
+                    , animate = True
                   }
                 , noteToJS note.tone_val
                 )
@@ -138,6 +141,7 @@ update msg model =
             else if model.mousedown == True then
                 ( { model
                     | signal = note.tone_val
+                    , animate = True
                   }
                 , noteToJS note.tone_val
                 )
@@ -145,12 +149,13 @@ update msg model =
                 model ! []
 
         MouseLeave ->
-            ( { model | signal = "" }, noteToJS "" )
+            ( { model | signal = "", animate = False }, noteToJS "" )
 
         MouseUp ->
             ( { model
                 | signal = ""
                 , mousedown = False
+                , animate = False
               }
             , noteToJS ""
             )
@@ -160,6 +165,7 @@ update msg model =
             ( { model
                 | debuglog = "I registered: " ++ note.tone_val
                 , touchEngaged = True
+                , animate = True
               }
             , noteToJS note.tone_val
             )
@@ -168,12 +174,13 @@ update msg model =
             ( { model
                 | debuglog = "Note last touched: " ++ note.tone_val
                 , touchEngaged = False
+                , animate = False
               }
             , noteToJS ""
             )
 
         CancelTouch note ->
-            ( model, noteToJS "" )
+            ( { model | animate = False }, noteToJS "" )
 
         Clear ->
             ( { model | modal = True }, initMobile "" )
@@ -204,35 +211,28 @@ view model =
 instrument : Model -> Html Msg
 instrument model =
     div [ class "instrument" ]
-        [ htmlKeys model.notes
+        [ htmlKeys model
         , div
             [ class "panel" ]
             [ selectSynth model ]
         ]
 
 
-
--- addClass : Model -> List -> Html Msg
--- addClass model noteList =
---     List.map (\a -> classList [ ( "htmlNote", True ), ( "keydown", model.mousedown ) ] :: a) noteList
-
-
 {-| Takes a note list and maps the values with our htmlNote below
 -}
-htmlKeys : List Note -> Html Msg
-htmlKeys notesList =
+htmlKeys : Model -> Html Msg
+htmlKeys model =
     let
         htmlNotes =
-            notesList
-                |> List.map htmlNote
+            List.map (htmlNote model) model.notes
     in
         div [ class "htmlKeys", id "notes" ] htmlNotes
 
 
-htmlNote : Note -> Html Msg
-htmlNote note =
+htmlNote : Model -> Note -> Html Msg
+htmlNote model note =
     div
-        [ classList [ ( "htmlNote", True ), ( "keydown", False ) ]
+        [ classList [ ( "htmlNote", True ) ]
         , id (toString note.value)
         , MultiTouch.onStart (always <| StartTouch note)
         , MultiTouch.onEnd (always <| EndTouch note)
@@ -289,13 +289,13 @@ port synthToJS : String -> Cmd msg
 -}
 noteDecoder : Decoder Note
 noteDecoder =
-    Json.map6 Note
-        (field "color" Json.string)
-        (field "shape" Json.string)
-        (field "value" Json.int)
-        (field "tone_val" Json.string)
-        (field "path" Json.string)
-        (field "hex_value" Json.string)
+    ReadJson.map6 Note
+        (field "color" ReadJson.string)
+        (field "shape" ReadJson.string)
+        (field "value" ReadJson.int)
+        (field "tone_val" ReadJson.string)
+        (field "path" ReadJson.string)
+        (field "hex_value" ReadJson.string)
 
 
 {-| Calls to the JSON api to retrieve our note values from a simple database
@@ -306,7 +306,7 @@ getNotes =
         notesUrl =
             "https://api.myjson.com/bins/u0bbj"
     in
-        (Json.list noteDecoder)
+        (ReadJson.list noteDecoder)
             |> Http.get notesUrl
             |> Http.send GetNotes
 
