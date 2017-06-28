@@ -37,6 +37,7 @@ type alias Note =
     , tone_val : String
     , svgPath : String
     , hex_val : String
+    , animate : Bool
     }
 
 
@@ -117,70 +118,113 @@ update msg model =
                 ( { model | notes = dbNotes }, Task.attempt (always NoOp) <| offset )
 
         GetNotes (Err error) ->
-            ( { model | alertMessage = Just (httpErrorToMessage error) }, Cmd.none )
+            ({ model | alertMessage = Just (httpErrorToMessage error) } ! [])
 
         ChooseSound synth ->
             ( { model | instrument = synth }, synthToJS synth )
 
         -- Mouse Events
         MouseDown note ->
-            if model.touchEngaged == True then
-                model ! []
-            else
-                ( { model
-                    | signal = note.tone_val
-                    , mousedown = True
-                    , animate = True
-                  }
-                , noteToJS note.tone_val
-                )
+            let
+                updateAnimate innernote =
+                    if innernote.tone_val == note.tone_val then
+                        { innernote | animate = True }
+                    else
+                        { innernote | animate = False }
+            in
+                if model.touchEngaged == True then
+                    model ! []
+                else
+                    ( { model
+                        | signal = note.tone_val
+                        , mousedown = True
+                        , animate = True
+                        , notes = List.map updateAnimate model.notes
+                      }
+                    , noteToJS note.tone_val
+                    )
 
         MouseEnter note ->
-            if model.touchEngaged == True then
-                model ! []
-            else if model.mousedown == True then
-                ( { model
-                    | signal = note.tone_val
-                    , animate = True
-                  }
-                , noteToJS note.tone_val
-                )
-            else
-                model ! []
+            let
+                updateAnimate innernote =
+                    if innernote.tone_val == note.tone_val then
+                        { innernote | animate = True }
+                    else
+                        { innernote | animate = False }
+            in
+                if model.touchEngaged == True then
+                    model ! []
+                else if model.mousedown == True then
+                    ( { model
+                        | signal = note.tone_val
+                        , notes = List.map updateAnimate model.notes
+                      }
+                    , noteToJS note.tone_val
+                    )
+                else
+                    model ! []
 
         MouseLeave ->
-            ( { model | signal = "", animate = False }, noteToJS "" )
+            let
+                updateAnimate innernote =
+                    { innernote | animate = False }
+            in
+                ( { model
+                    | signal = ""
+                    , notes = List.map updateAnimate model.notes
+                  }
+                , noteToJS ""
+                )
 
         MouseUp ->
-            ( { model
-                | signal = ""
-                , mousedown = False
-                , animate = False
-              }
-            , noteToJS ""
-            )
+            let
+                updateAnimate innernote =
+                    { innernote | animate = False }
+            in
+                ( { model
+                    | signal = ""
+                    , mousedown = False
+                    , notes = List.map updateAnimate model.notes
+                  }
+                , noteToJS ""
+                )
 
         -- Touch Events
         StartTouch note ->
-            ( { model
-                | debuglog = "I registered: " ++ note.tone_val
-                , touchEngaged = True
-                , animate = True
-              }
-            , noteToJS note.tone_val
-            )
+            let
+                updateAnimate innernote =
+                    if innernote.tone_val == note.tone_val then
+                        { innernote | animate = True }
+                    else
+                        { innernote | animate = False }
+            in
+                ( { model
+                    | debuglog = "I registered: " ++ note.tone_val
+                    , touchEngaged = True
+                    , notes = List.map updateAnimate model.notes
+                  }
+                , noteToJS note.tone_val
+                )
 
         EndTouch note ->
-            ( { model
-                | debuglog = "Note last touched: " ++ note.tone_val
-                , touchEngaged = False
-                , animate = False
-              }
-            , noteToJS ""
-            )
+            let
+                updateAnimate innernote =
+                    { innernote | animate = False }
+            in
+                ( { model
+                    | debuglog = "Note last touched: " ++ note.tone_val
+                    , touchEngaged = False
+                    , notes = List.map updateAnimate model.notes
+                  }
+                , noteToJS ""
+                )
 
         CancelTouch note ->
-            ( { model | animate = False }, noteToJS "" )
+            let
+                updateAnimate innernote =
+                    { innernote | animate = False }
+            in
+                ( { model | notes = List.map updateAnimate model.notes }, noteToJS "" )
 
         Clear ->
             ( { model | modal = True }, initMobile "" )
@@ -232,7 +276,7 @@ htmlKeys model =
 htmlNote : Model -> Note -> Html Msg
 htmlNote model note =
     div
-        [ classList [ ( "htmlNote", True ) ]
+        [ classList [ ( "htmlNote", True ), ( "keydown", note.animate ) ]
         , id (toString note.value)
         , MultiTouch.onStart (always <| StartTouch note)
         , MultiTouch.onEnd (always <| EndTouch note)
@@ -289,13 +333,14 @@ port synthToJS : String -> Cmd msg
 -}
 noteDecoder : Decoder Note
 noteDecoder =
-    ReadJson.map6 Note
+    ReadJson.map7 Note
         (field "color" ReadJson.string)
         (field "shape" ReadJson.string)
         (field "value" ReadJson.int)
         (field "tone_val" ReadJson.string)
         (field "path" ReadJson.string)
         (field "hex_value" ReadJson.string)
+        (succeed False)
 
 
 {-| Calls to the JSON api to retrieve our note values from a simple database
