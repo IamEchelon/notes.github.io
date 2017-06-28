@@ -98,7 +98,6 @@ type Msg
     | EndTouch Note
     | CancelTouch Note
     | Clear
-    | SomeAction
 
 
 
@@ -192,35 +191,43 @@ update msg model =
 
         -- Touch Events
         StartTouch note ->
-            ( { model
-                | debuglog = "I registered: " ++ note.tone_val
-                , touchEngaged = True
-                , animate = True
-              }
-            , noteToJS note.tone_val
-            )
+            let
+                updateAnimate innernote =
+                    if innernote.tone_val == note.tone_val then
+                        { innernote | animate = True }
+                    else
+                        { innernote | animate = False }
+            in
+                ( { model
+                    | debuglog = "I registered: " ++ note.tone_val
+                    , touchEngaged = True
+                    , notes = List.map updateAnimate model.notes
+                  }
+                , noteToJS note.tone_val
+                )
 
         EndTouch note ->
-            ( { model
-                | debuglog = "Note last touched: " ++ note.tone_val
-                , touchEngaged = False
-                , animate = False
-              }
-            , noteToJS ""
-            )
+            let
+                updateAnimate innernote =
+                    { innernote | animate = False }
+            in
+                ( { model
+                    | debuglog = "Note last touched: " ++ note.tone_val
+                    , touchEngaged = False
+                    , notes = List.map updateAnimate model.notes
+                  }
+                , noteToJS ""
+                )
 
         CancelTouch note ->
-            ( { model | animate = False }, noteToJS "" )
+            let
+                updateAnimate innernote =
+                    { innernote | animate = False }
+            in
+                ( { model | notes = List.map updateAnimate model.notes }, noteToJS "" )
 
         Clear ->
             ( { model | modal = True }, initMobile "" )
-
-        SomeAction ->
-            let
-                myMapper note =
-                    { note | value = 0 }
-            in
-                { model | notes = List.map myMapper model.notes } ! []
 
 
 
@@ -278,7 +285,6 @@ htmlNote model note =
         , Events.onMouseEnter <| MouseEnter note
         , Events.onMouseLeave MouseLeave
         , Events.onMouseUp MouseUp
-        , Events.onDoubleClick SomeAction
         ]
         [ Shapes.makeSvg note.svgPath note.hex_val ]
 
