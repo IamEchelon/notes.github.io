@@ -2,21 +2,21 @@
 
 $panelColor = #D8D8D8
 
-$gridpixel = 2
+$width = 150px
+$xspacing = 3.5px
+$spacer = ($width / 2) + ($xspacing)
 
-$half-x-spacing()
-    ( $gridpixel / 2)px
+// geometry for hexagon height
+$cap_geometry = tan(30deg)px
 
+// height for top of hexagon
+$margin_height = (($width / 2) * $cap_geometry) / 2
 
-// Unused helper functions for positioning hexagon grid
+// Spacing between hexagons on x axis
+$half-x-spacing = ( $xspacing / 2)px
 
-// $sqrRt = math(3, "sqrt")
-// $tan = tan(30deg)
-// $y-spacing()
-//     ($half-x-spacing() * $sqrrt )px
-// $cap-height()
-//     ((150/2) * $tan)px
-
+// Lower half spacing but seems off
+// $yspacing = $half-x-spacing * math(3, "sqrt")px
 
 
 // Shape Key Panel Styles
@@ -33,33 +33,17 @@ $half-x-spacing()
     margin-top: 30px
 
 .htmlKeys .htmlNote:nth-child(12n + 7)
-    margin-left: 77px
-
-.htmlKeys .htmlNote:nth-child(12n + 1)
-    margin-right: 0px
+    margin-left: $spacer
 
 
 .htmlNote
     cursor: pointer
-    width: 150px
-    // margin-bottom: -46px
-    margin: -22.5px $half-x-spacing() 
+    width: $width
+    margin: -($margin_height) $half-x-spacing
+    // margin-left: $half-x-spacing 
     transition: all 100ms ease-in;
     transform: scale(1)
     animation: bounce 1s infinite alternate;
-
-// @keyframes bounce {
-//   from {
-//     transform: translateY(0px);
-//   }
-//   to {
-//     transform: translateY(-15px);
-//   }
-// }
-
-// .htmlNote:active
-//     transition: all 100ms ease-in;
-//     transform: scale(.80)
 
 .keydown
     transition: all 100ms ease-in;
