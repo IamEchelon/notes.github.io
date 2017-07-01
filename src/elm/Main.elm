@@ -237,7 +237,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div [ class "notesBody", Events.onMouseUp MouseUp ]
-        [ div [ classList [ ( "modal", True ), ( "hide", model.modal ) ] ]
+        [ div [ classList [ ( "modal is-hidden-touch", True ), ( "hide", model.modal ) ] ]
             [ button
                 [ classList [ ( "hide", model.modal ) ]
                 , id "playButton"
@@ -258,7 +258,10 @@ instrument model =
         [ htmlKeys model
         , div
             [ class "panel" ]
-            [ selectSynth model ]
+            [ div
+                [ class "container columns" ]
+                [ selectSynth model ]
+            ]
         ]
 
 
@@ -298,7 +301,7 @@ selectSynth model =
         synthOptions =
             List.map synthOption synthesizers
     in
-        div [ class "selectSynth" ]
+        div [ class "column selectSynth" ]
             [ select
                 [ Events.onInput ChooseSound ]
                 synthOptions
