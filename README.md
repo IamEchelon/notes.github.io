@@ -15,3 +15,5 @@ built today using computer software and modern tools?
 - [ ] Create more instruments
 - [ ] Setup mobile styles and features
 - [ ] Fix clip path to correct note overlap
+- [ ] Covert styles over to bulma where applicable
+- [ ] modularize JS
