@@ -13,6 +13,7 @@ const autoprefixer = require('gulp-autoprefixer');
 const audiocontext = require('startaudiocontext');
 
 
+
 // Main Tasks
 
 
@@ -29,19 +30,6 @@ gulp.task('clean', () => {
         .pipe(clean())
 
 });
-
-// gulp.task('image', () => {
-//     gulp.src('src/images/*')
-//         .pipe(image({
-//             svgo: false
-//         }))
-//         .on('error', notify.onError((error) => {
-//             return "Message to the notifier: " + error.message;
-//         }))
-//         .pipe(plumber())
-//         .pipe(gulp.dest('dist/images'));
-// });
-
 
 gulp.task('elm-init', elm.init);
 
@@ -88,6 +76,22 @@ gulp.task('stylus', () => {
         .pipe(gulp.dest('dist'))
         .pipe(browserSync.stream());
 });
+
+// gulp.task('sass', () => {
+//     return gulp.src('src/**/*.scss')
+//         .pipe(sourcemaps.init())
+//         .pipe(sass({
+//             compress: true
+//         }))
+//         .on('error', notify.onError((error) => {
+//             return "Message to the notifier: " + error.message;
+//         }))
+//         .pipe(plumber())
+//         .pipe(autoprefixer())
+//         .pipe(sourcemaps.write())
+//         .pipe(gulp.dest('dist'))
+//         .pipe(browserSync.stream());
+// });
 
 gulp.task('html', function () {
     gulp.src('src/*.html')
