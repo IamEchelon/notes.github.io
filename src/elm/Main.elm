@@ -63,7 +63,7 @@ initialModel =
     , debuglog = ""
     , mousedown = False
     , touchEngaged = False
-    , modal = False
+    , modal = True
     , animate = False
     }
 
@@ -80,6 +80,49 @@ synthesizers =
     , "monosynth"
     , "plucksynth"
     ]
+
+
+{-| Parses our JSON data to setup each note
+-}
+noteDecoder : Decoder Note
+noteDecoder =
+    ReadJson.map7 Note
+        (field "color" ReadJson.string)
+        (field "shape" ReadJson.string)
+        (field "value" ReadJson.int)
+        (field "tone_val" ReadJson.string)
+        (field "path" ReadJson.string)
+        (field "hex_value" ReadJson.string)
+        (succeed False)
+
+
+{-| Calls to the JSON api to retrieve our note values from a simple database
+-}
+getNotes : Cmd Msg
+getNotes =
+    let
+        notesUrl =
+            "https://api.myjson.com/bins/u0bbj"
+    in
+        (ReadJson.list noteDecoder)
+            |> Http.get notesUrl
+            |> Http.send GetNotes
+
+
+httpErrorToMessage : Http.Error -> String
+httpErrorToMessage error =
+    case error of
+        Http.NetworkError ->
+            "Is the Server Running?"
+
+        Http.BadStatus response ->
+            toString response.status
+
+        Http.BadPayload message _ ->
+            "Decoding failed, " ++ message
+
+        _ ->
+            toString error
 
 
 
@@ -227,7 +270,18 @@ update msg model =
                 ( { model | notes = List.map updateAnimate model.notes }, noteToJS "" )
 
         Clear ->
-            ( { model | modal = True }, initMobile "" )
+            ( { model | modal = False }, initMobile "" )
+
+
+{-| Ports that are called by our update function
+-}
+port initMobile : String -> Cmd msg
+
+
+port noteToJS : String -> Cmd msg
+
+
+port synthToJS : String -> Cmd msg
 
 
 
@@ -237,17 +291,36 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div [ class "notesBody", Events.onMouseUp MouseUp ]
-        [ div [ classList [ ( "modal is-hidden-touch", True ), ( "hide", model.modal ) ] ]
-            [ button
-                [ classList [ ( "hide", model.modal ) ]
-                , id "playButton"
-                , Events.onClick Clear
-                ]
-                [ text "Start" ]
-            ]
+        [ mobileModal model
         , instrument model
         , apiAlertMessage model.alertMessage
         ]
+
+
+{-| This is the backsplash for setting our Audio context in ToneJS
+-}
+mobileModal : Model -> Html Msg
+mobileModal model =
+    div
+        [ classList
+            [ ( "modal", True )
+            , ( "is-active", model.modal )
+            , ( "is-hidden-desktop", True )
+            ]
+        ]
+        [ div [ class "modal-background" ] []
+        , div [ class "modal-content has-text-centered" ] [ modalButton model ]
+        ]
+
+
+modalButton : Model -> Html Msg
+modalButton model =
+    button
+        [ classList [ ( "is-active", model.modal ) ]
+        , id "playButton"
+        , Events.onClick Clear
+        ]
+        [ text "Start" ]
 
 
 {-| Creates a container for all components that create our instrument functionality
@@ -317,59 +390,3 @@ apiAlertMessage alertMessage =
 
         Nothing ->
             Html.text ""
-
-
-
--- External
-
-
-port initMobile : String -> Cmd msg
-
-
-port noteToJS : String -> Cmd msg
-
-
-port synthToJS : String -> Cmd msg
-
-
-{-| Parses our JSON data to setup each note
--}
-noteDecoder : Decoder Note
-noteDecoder =
-    ReadJson.map7 Note
-        (field "color" ReadJson.string)
-        (field "shape" ReadJson.string)
-        (field "value" ReadJson.int)
-        (field "tone_val" ReadJson.string)
-        (field "path" ReadJson.string)
-        (field "hex_value" ReadJson.string)
-        (succeed False)
-
-
-{-| Calls to the JSON api to retrieve our note values from a simple database
--}
-getNotes : Cmd Msg
-getNotes =
-    let
-        notesUrl =
-            "https://api.myjson.com/bins/u0bbj"
-    in
-        (ReadJson.list noteDecoder)
-            |> Http.get notesUrl
-            |> Http.send GetNotes
-
-
-httpErrorToMessage : Http.Error -> String
-httpErrorToMessage error =
-    case error of
-        Http.NetworkError ->
-            "Is the Server Running?"
-
-        Http.BadStatus response ->
-            toString response.status
-
-        Http.BadPayload message _ ->
-            "Decoding failed, " ++ message
-
-        _ ->
-            toString error

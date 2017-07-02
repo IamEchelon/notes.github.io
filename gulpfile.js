@@ -37,7 +37,7 @@ gulp.task('elm-init', elm.init);
 gulp.task('elm', ['elm-init'], () => {
     return gulp.src('src/elm/*.elm')
         .pipe(elm.bundle('notes.js', {
-            //debug: true
+            debug: true
         }))
         .on('error', notify.onError((error) => {
             return "Message to the notifier: " + error.message;
