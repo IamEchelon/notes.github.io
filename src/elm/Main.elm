@@ -426,7 +426,7 @@ logo =
         [ class "logo column" ]
         [ h1
             [ class "title" ]
-            [ text "LOOOOOP" ]
+            [ text "Notes" ]
         ]
 
 
