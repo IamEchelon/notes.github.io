@@ -332,8 +332,8 @@ instrument model =
         , div
             [ class "panel" ]
             [ div
-                [ class "container columns" ]
-                [ selectSynth model ]
+                [ class "" ]
+                [ instPanel model ]
             ]
         ]
 
@@ -365,6 +365,16 @@ htmlNote model note =
         [ Shapes.makeSvg note.svgPath note.hex_val ]
 
 
+instPanel : Model -> Html Msg
+instPanel model =
+    div [ class "columns" ]
+        [ selectSynth model
+        , synthControls
+        , transpControls
+        , logo
+        ]
+
+
 selectSynth : Model -> Html Msg
 selectSynth model =
     let
@@ -374,11 +384,50 @@ selectSynth model =
         synthOptions =
             List.map synthOption synthesizers
     in
-        div [ class "column selectSynth" ]
-            [ select
-                [ Events.onInput ChooseSound ]
-                synthOptions
+        div
+            [ classList
+                [ ( "column", True )
+                , ( "selectSynth", True )
+                ]
             ]
+            [ label
+                [ class "label" ]
+                [ text "Instruments"
+                , select
+                    [ Events.onInput ChooseSound ]
+                    synthOptions
+                ]
+            ]
+
+
+synthControls : Html Msg
+synthControls =
+    div
+        [ class "controls column" ]
+        [ h1 [] [ text "Attack" ]
+        , h1 [] [ text "Modulation" ]
+        , h1 [] [ text "Wave" ]
+        ]
+
+
+transpControls : Html Msg
+transpControls =
+    div
+        [ class "controls column" ]
+        [ h1 [] [ text "Play" ]
+        , h1 [] [ text "Stop" ]
+        , h1 [] [ text "Record" ]
+        ]
+
+
+logo : Html Msg
+logo =
+    div
+        [ class "logo column" ]
+        [ h1
+            [ class "title" ]
+            [ text "LOOOOOP" ]
+        ]
 
 
 apiAlertMessage : Maybe String -> Html Msg
