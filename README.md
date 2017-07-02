@@ -7,7 +7,9 @@ built today using computer software and modern tools?
 
 ## TODO
 
-- [ ] Hide modal on desktop
+- [x] Hide modal on desktop and fix height
+- [ ] Fix scroll positioning issue
+- [ ] Add full key layout
 - [ ] Replace JS with typescript
 - [ ] Correct sound clipping issue
 - [ ] Setup grid switching for note view
@@ -15,3 +17,6 @@ built today using computer software and modern tools?
 - [ ] Create more instruments
 - [ ] Setup mobile styles and features
 - [ ] Fix clip path to correct note overlap
+- [ ] Covert styles over to bulma where applicable ***in progess***
+- [ ] modularize JS ***in progress***
+- [x] Prevent text select on instruments

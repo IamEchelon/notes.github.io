@@ -4,6 +4,7 @@ const elm = require('gulp-elm');
 const babel = require('gulp-babel');
 const browserSync = require('browser-sync').create();
 const stylus = require('gulp-stylus');
+const sass = require('gulp-sass');
 const concat = require('gulp-concat');
 const sourcemaps = require('gulp-sourcemaps');
 const plumber = require('gulp-plumber');
@@ -61,26 +62,10 @@ gulp.task('babel', () => {
 });
 
 
-gulp.task('stylus', () => {
-    return gulp.src('src/**/*.styl')
-        .pipe(sourcemaps.init())
-        .pipe(stylus({
-            compress: true
-        }))
-        .on('error', notify.onError((error) => {
-            return "Message to the notifier: " + error.message;
-        }))
-        .pipe(plumber())
-        .pipe(autoprefixer())
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest('dist'))
-        .pipe(browserSync.stream());
-});
-
-// gulp.task('sass', () => {
-//     return gulp.src('src/**/*.scss')
+// gulp.task('stylus', () => {
+//     return gulp.src('src/**/*.styl')
 //         .pipe(sourcemaps.init())
-//         .pipe(sass({
+//         .pipe(stylus({
 //             compress: true
 //         }))
 //         .on('error', notify.onError((error) => {
@@ -92,6 +77,22 @@ gulp.task('stylus', () => {
 //         .pipe(gulp.dest('dist'))
 //         .pipe(browserSync.stream());
 // });
+
+gulp.task('sass', () => {
+    return gulp.src('src/**/main.sass')
+        .pipe(sourcemaps.init())
+        .pipe(sass({
+            includePaths: 'node_modules/bulma'
+        }))
+        .on('error', notify.onError((error) => {
+            return "Message to the notifier: " + error.message;
+        }))
+        .pipe(plumber())
+        .pipe(autoprefixer())
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest('dist'))
+        .pipe(browserSync.stream());
+});
 
 gulp.task('html', function () {
     gulp.src('src/*.html')
@@ -107,11 +108,11 @@ gulp.task('watch', () => {
     gulp.watch('src/**/*.elm', ['elm']);
     gulp.watch('src/**/*.js', ['babel']);
     gulp.watch('src/*.html', ['html']);
-    gulp.watch('src/**/*.styl', ['stylus']);
+    gulp.watch('src/**/*.sass', ['sass']);
 });
 
 
 // DEFAULT
 
 
-gulp.task('default', ['stylus', 'elm', 'babel', 'html', 'watch', 'browser-sync']);
+gulp.task('default', ['sass', 'elm', 'babel', 'html', 'watch', 'browser-sync']);
