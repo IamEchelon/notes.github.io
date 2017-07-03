@@ -332,7 +332,7 @@ instrument model =
         , div
             [ class "panel" ]
             [ div
-                [ class "" ]
+                [ class "fluid-container" ]
                 [ instPanel model ]
             ]
         ]

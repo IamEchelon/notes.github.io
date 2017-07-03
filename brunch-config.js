@@ -7,7 +7,7 @@ module.exports = {
     files: {
       javascripts: {
         joinTo: {
-          'js/vendor.js': /^node_modules/,
+          'js/vendor.js': /^(?!app)/,
           'js/app.js': /^app/
         }
       },
@@ -21,11 +21,7 @@ module.exports = {
     },
 
     plugins: {
-      browserSync: {
-          port: 3333,
-          logLevel: "debug"
-      },
-      
+
       elmBrunch: {
         mainModules: ["app/elm/Main.elm"],
         outputFolder: "public/js/",
@@ -34,7 +30,6 @@ module.exports = {
       
       sass: {
         mode: "native",
-        percision: 8,
         options: {
           includePaths: [
             'node_modules/bulma'
@@ -49,6 +44,14 @@ module.exports = {
           /^elm/
         ]
       }
+
+      // browserSync: {
+      //     port: 3333,
+      //     logLevel: "debug",
+      //     open: "local",
+      //     notify: false
+      // },
+
     }
   }
 };

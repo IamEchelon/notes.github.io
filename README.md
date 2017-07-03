@@ -8,6 +8,8 @@ built today using computer software and modern tools?
 ## TODO
 
 - [x] Hide modal on desktop and fix height
+- [x] Replace Gulp with Brunch for streamlined build system
+- [ ] Add Logo
 - [ ] Fix scroll positioning issue
 - [ ] Add full key layout
 - [ ] Replace JS with typescript
