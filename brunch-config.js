@@ -43,14 +43,14 @@ module.exports = {
           // /^node_modules/,
           /^elm/
         ]
-      }
+      },
 
-      // browserSync: {
-      //     port: 3333,
-      //     logLevel: "debug",
-      //     open: "local",
-      //     notify: false
-      // },
+      browserSync: {
+          port: 3333,
+          logLevel: "debug",
+          // open: "local",
+          notify: false
+      },
 
     }
   }

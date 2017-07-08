@@ -9,6 +9,7 @@ import Dom.Scroll
 import Task
 import Shapes exposing (makeSvg)
 import MultiTouch exposing (..)
+import Style exposing (..)
 
 
 -- Main
@@ -330,7 +331,7 @@ instrument model =
     div [ class "instrument" ]
         [ htmlKeys model
         , div
-            [ class "panel" ]
+            [ class "panel level" ]
             [ div
                 [ class "fluid-container" ]
                 [ instPanel model ]
@@ -365,9 +366,21 @@ htmlNote model note =
         [ Shapes.makeSvg note.svgPath note.hex_val ]
 
 
+panelStyles : List Style
+panelStyles =
+    [ display flex_
+
+    -- , flexDirection row
+    -- , justifyContent center
+    ]
+
+
 instPanel : Model -> Html Msg
 instPanel model =
-    div [ class "columns" ]
+    div
+        [ style panelStyles
+        , class "instpanel"
+        ]
         [ selectSynth model
         , synthControls
         , transpControls
@@ -386,8 +399,7 @@ selectSynth model =
     in
         div
             [ classList
-                [ ( "column", True )
-                , ( "selectSynth", True )
+                [ ( "selectSynth", True )
                 ]
             ]
             [ label
@@ -403,7 +415,7 @@ selectSynth model =
 synthControls : Html Msg
 synthControls =
     div
-        [ class "controls column" ]
+        [ class "controls" ]
         [ h1 [] [ text "Attack" ]
         , h1 [] [ text "Modulation" ]
         , h1 [] [ text "Wave" ]
@@ -413,7 +425,7 @@ synthControls =
 transpControls : Html Msg
 transpControls =
     div
-        [ class "controls column" ]
+        [ class "controls" ]
         [ h1 [] [ text "Play" ]
         , h1 [] [ text "Stop" ]
         , h1 [] [ text "Record" ]
@@ -423,10 +435,10 @@ transpControls =
 logo : Html Msg
 logo =
     div
-        [ class "logo column" ]
-        [ h1
-            [ class "title" ]
-            [ text "Notes" ]
+        [ class "logo level-right" ]
+        [ img
+            [ class "title", src "images/logo.png" ]
+            []
         ]
 
 
