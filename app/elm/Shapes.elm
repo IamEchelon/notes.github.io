@@ -24,10 +24,16 @@ makeSvg shapePath color =
         , y "30"
         , viewBox "0 0 174 200"
         ]
-        [ Svg.path
+        [ defs []
+            [ Svg.clipPath
+                [ id "hex" ]
+                [ Svg.path [ strokeWidth "1", d "M86.6025404 0l86.6025406 50v100l-86.6025406 50L0 150V50" ] []
+                ]
+            ]
+        , Svg.path
             [ id "hex"
             , d shapePath
             , fill color
             ]
-            [ g [ fillRule "evenodd" ] [] ]
+            []
         ]

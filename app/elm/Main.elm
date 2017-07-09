@@ -9,7 +9,6 @@ import Dom.Scroll
 import Task
 import Shapes exposing (makeSvg)
 import MultiTouch exposing (..)
-import Style exposing (..)
 
 
 -- Main
@@ -332,10 +331,7 @@ instrument model =
         [ htmlKeys model
         , div
             [ class "panel" ]
-            [ div
-                [ class "fluid-container" ]
-                [ instPanel model ]
-            ]
+            [ instPanel model ]
         ]
 
 
@@ -364,15 +360,6 @@ htmlNote model note =
         , Events.onMouseUp MouseUp
         ]
         [ Shapes.makeSvg note.svgPath note.hex_val ]
-
-
-
--- panelStyles : List Style
--- panelStyles =
---     [ display flex_
---     -- , flexDirection row
---     -- , justifyContent center
---     ]
 
 
 instPanel : Model -> Html Msg
