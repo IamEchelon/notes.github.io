@@ -21,5 +21,8 @@
     "start": "brunch watch -s",
     "build": "brunch build",
     "clean": "rm -r public"
+  },
+  "devDependencies": {
+    "prettier": "^1.5.2"
   }
 }

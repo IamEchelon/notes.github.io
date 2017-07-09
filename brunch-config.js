@@ -7,51 +7,36 @@ module.exports = {
     files: {
       javascripts: {
         joinTo: {
-          'js/vendor.js': /^(?!app)/,
-          'js/app.js': /^app/
+          "js/vendor.js": /^(?!app)/,
+          "js/app.js": /^app/
         }
       },
-      
       stylesheets: {
         joinTo: "css/app.css"
       }
     },
-    npm: {
-
-    },
 
     plugins: {
-
       elmBrunch: {
         mainModules: ["app/elm/Main.elm"],
         outputFolder: "public/js/",
-        parameters: ['--warn']
+        parameters: ["--warn", "--debug"]
       },
-      
       sass: {
         mode: "native",
         options: {
-          includePaths: [
-            'node_modules/bulma'
-          ]
+          includePaths: ["node_modules/bulma"]
         }
       },
-      
       babel: {
-        presets: ['es2015'],
-        ignore: [
-          // /^node_modules/,
-          /^elm/
-        ]
+        presets: ["es2015"],
+        ignore: [/^elm/]
       },
-
       browserSync: {
-          port: 3333,
-          logLevel: "debug",
-          // open: "local",
-          notify: false
-      },
-
+        port: 3333,
+        logLevel: "debug",
+        notify: false
+      }
     }
   }
 };

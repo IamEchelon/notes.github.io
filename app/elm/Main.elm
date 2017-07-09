@@ -331,7 +331,7 @@ instrument model =
     div [ class "instrument" ]
         [ htmlKeys model
         , div
-            [ class "panel level" ]
+            [ class "panel" ]
             [ div
                 [ class "fluid-container" ]
                 [ instPanel model ]
@@ -366,20 +366,19 @@ htmlNote model note =
         [ Shapes.makeSvg note.svgPath note.hex_val ]
 
 
-panelStyles : List Style
-panelStyles =
-    [ display flex_
 
-    -- , flexDirection row
-    -- , justifyContent center
-    ]
+-- panelStyles : List Style
+-- panelStyles =
+--     [ display flex_
+--     -- , flexDirection row
+--     -- , justifyContent center
+--     ]
 
 
 instPanel : Model -> Html Msg
 instPanel model =
     div
-        [ style panelStyles
-        , class "instpanel"
+        [ class "instpanel"
         ]
         [ selectSynth model
         , synthControls
@@ -403,12 +402,12 @@ selectSynth model =
                 ]
             ]
             [ label
-                [ class "label" ]
+                [ class "label has-text-centered" ]
                 [ text "Instruments"
-                , select
-                    [ Events.onInput ChooseSound ]
-                    synthOptions
                 ]
+            , select
+                [ Events.onInput ChooseSound ]
+                synthOptions
             ]
 
 
@@ -435,7 +434,7 @@ transpControls =
 logo : Html Msg
 logo =
     div
-        [ class "logo level-right" ]
+        [ class "logo" ]
         [ img
             [ class "title", src "images/logo.png" ]
             []
