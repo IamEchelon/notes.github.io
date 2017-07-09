@@ -1,12 +1,11 @@
-@import includeMedia
-@import formulas
+@import _functions
 @import bulma
 
 // Constants
 $panelColor: #D8D8D8
 
 $width: 150px
-$xspacing: 4px
+$xspacing: 5px
 $spacer: $width / 2 + $xspacing
 
 // geometry for hexagon height
@@ -21,28 +20,62 @@ $half-x-spacing: $xspacing / 2
 
 // Shape Key Panel Styles
 
+
+
 .htmlKeys
 	width: 1100px
 	display: flex
 	flex-direction: row
-    justify-content: center
-	flex-wrap: wrap-reverse
-	padding-bottom: 220px
+	flex-wrap: wrap-reverse	
+	padding-bottom: 150px
+	padding-left: $width/3
 	margin: 40px auto 0
-
 
 .htmlKeys .htmlNote:nth-child(12n + 7)
 	margin-left: $spacer
+// .htmlKeys .htmlNote:nth-child(12n + 1)
+//     margin-right: 0px
 
 .htmlNote
 	cursor: pointer
 	width: $width
 	margin: -$margin_height $half-x-spacing
-
-	// margin-left: $half-x-spacing
 	transition: all 100ms ease-in
 	transform: scale(1)
 	animation: bounce 1s infinite alternate
+	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)
+
+Triangle
+Trapezoid
+Parallelogram
+Rhombus
+Pentagon
+Hexagon
+Heptagon
+Octagon
+Nonagon
+Decagon
+Bevel
+Rabbet
+Left arrow
+Right arrow
+Left Point
+Right Point
+Left Chevron
+Right Chevron
+Star
+Cross
+Message
+Close
+Frame
+Inset
+Custom Polygon
+Circle
+Ellipse
+Prefix
+webkit
+Demo Size
+
 
 .keydown
 	transition: all 100ms ease-in
@@ -59,10 +92,12 @@ $half-x-spacing: $xspacing / 2
 	bottom: 0
 	right: 0
 	left: 0
-	padding: 20px
 
 
 .selectSynth
+	.label
+		// margin-bottom: 0px
+
 	select
 		user-select: none
 		text-align: center
@@ -91,6 +126,14 @@ $half-x-spacing: $xspacing / 2
 	letter-spacing: 1px
 
 
+.instpanel
+	display: flex
+	height: 100%
+	width: 100%
+	flex-direction: row
+	justify-content: space-around
+	align-items: center
+	align-content: center
 
 // Mobile styles
        

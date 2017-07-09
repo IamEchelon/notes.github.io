@@ -8,6 +8,8 @@ built today using computer software and modern tools?
 ## TODO
 
 - [x] Hide modal on desktop and fix height
+- [x] Replace Gulp with Brunch for streamlined build system
+- [x] Add Logo
 - [ ] Fix scroll positioning issue
 - [ ] Add full key layout
 - [ ] Replace JS with typescript
@@ -16,7 +18,7 @@ built today using computer software and modern tools?
 - [ ] Add settings to instruments
 - [ ] Create more instruments
 - [ ] Setup mobile styles and features
-- [ ] Fix clip path to correct note overlap
+- [x] Fix clip path to correct note overlap
 - [ ] Covert styles over to bulma where applicable ***in progess***
 - [ ] modularize JS ***in progress***
 - [x] Prevent text select on instruments

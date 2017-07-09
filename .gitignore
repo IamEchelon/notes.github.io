@@ -3,3 +3,5 @@ elm-stuff
 python_scripts
 .DS_Store
 /dist
+notebuilder.py
+/public

@@ -331,10 +331,7 @@ instrument model =
         [ htmlKeys model
         , div
             [ class "panel" ]
-            [ div
-                [ class "" ]
-                [ instPanel model ]
-            ]
+            [ instPanel model ]
         ]
 
 
@@ -367,7 +364,9 @@ htmlNote model note =
 
 instPanel : Model -> Html Msg
 instPanel model =
-    div [ class "columns" ]
+    div
+        [ class "instpanel"
+        ]
         [ selectSynth model
         , synthControls
         , transpControls
@@ -386,24 +385,23 @@ selectSynth model =
     in
         div
             [ classList
-                [ ( "column", True )
-                , ( "selectSynth", True )
+                [ ( "selectSynth", True )
                 ]
             ]
             [ label
-                [ class "label" ]
+                [ class "label has-text-centered" ]
                 [ text "Instruments"
-                , select
-                    [ Events.onInput ChooseSound ]
-                    synthOptions
                 ]
+            , select
+                [ Events.onInput ChooseSound ]
+                synthOptions
             ]
 
 
 synthControls : Html Msg
 synthControls =
     div
-        [ class "controls column" ]
+        [ class "controls" ]
         [ h1 [] [ text "Attack" ]
         , h1 [] [ text "Modulation" ]
         , h1 [] [ text "Wave" ]
@@ -413,7 +411,7 @@ synthControls =
 transpControls : Html Msg
 transpControls =
     div
-        [ class "controls column" ]
+        [ class "controls" ]
         [ h1 [] [ text "Play" ]
         , h1 [] [ text "Stop" ]
         , h1 [] [ text "Record" ]
@@ -423,10 +421,10 @@ transpControls =
 logo : Html Msg
 logo =
     div
-        [ class "logo column" ]
-        [ h1
-            [ class "title" ]
-            [ text "Notes" ]
+        [ class "logo" ]
+        [ img
+            [ class "title", src "images/logo.png" ]
+            []
         ]
 
 
