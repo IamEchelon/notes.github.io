@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
     .toMaster();
 
   // Selects & creates a new instance of tone synthesizer
-  chooseSynth = elmValue => {
-    switch (elmValue) {
+  chooseSynth = elmSynth => {
+    switch (elmSynth) {
       case 'duosynth':
         return duosynth;
       case 'fmsynth':
@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
     elmApp.ports.synthToJS.subscribe(synthSelection);
   }
 
-  function synthSelection(elmValue) {
-    synth = chooseSynth(elmValue);
+  function synthSelection(elmSynth) {
+    synth = chooseSynth(elmSynth);
     elmApp.ports.noteToJS.subscribe(triggerNote);
   }
 
