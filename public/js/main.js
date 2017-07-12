@@ -9936,7 +9936,7 @@ var _user$project$Main$synthesizers = {
 						_0: 'monosynth',
 						_1: {
 							ctor: '::',
-							_0: 'plucksynth',
+							_0: 'square',
 							_1: {ctor: '[]'}
 						}
 					}

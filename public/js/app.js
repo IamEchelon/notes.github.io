@@ -160,73 +160,81 @@ require.register("elm/Main.elm", function(exports, require, module) {
 });
 
 ;require.register("js/index.js", function(exports, require, module) {
-"use strict";
+'use strict';
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function () {
   // Set and initialize elm constants
-  var node = document.getElementById("note-box");
+  var node = document.getElementById('note-box');
   var elmApp = Elm.Main.embed(node);
   var synth;
   var chooseSynth;
   var context = new AudioContext();
 
+  // Set up initial instruments
+  var limiter = new Tone.Limiter(-14);
+  var duosynth = new Tone.DuoSynth().connect(limiter).toMaster();
+  var fmsynth = new Tone.FMSynth().connect(limiter).toMaster();
+  var square = new Tone.Synth({
+    oscillator: {
+      type: 'sawtooth'
+    },
+    envelope: {
+      attack: 0.01,
+      decay: 0.2,
+      sustain: 0.2,
+      release: 0.2
+    }
+  }).connect(limiter).toMaster();
+
   // Selects & creates a new instance of tone synthesizer
   chooseSynth = function chooseSynth(elmValue) {
     switch (elmValue) {
-      case "duosynth":
-        var limiter = new Tone.Limiter(-14);
-        return new Tone.DuoSynth().connect(limiter).toMaster();
-      case "fmsynth":
-        return new Tone.FMSynth().toMaster();
-      case "membsynth":
+      case 'duosynth':
+        return duosynth;
+      case 'fmsynth':
+        return fmsynth;
+      case 'membsynth':
         return new Tone.MembraneSynth().toMaster();
-      case "monosynth":
+      case 'monosynth':
         return new Tone.MonoSynth().toMaster();
-      case "plucksynth":
-        return new Tone.PluckSynth().toMaster();
-      case "amsynth":
+      case 'square':
+        return square;
+      case 'amsynth':
         return new Tone.AMSynth().toMaster();
-      case "Please Select a Sound-":
-        return "None";
+      case 'Please Select a Sound-':
+        return 'None';
       default:
-        console.log("Something has gone horribly awry!");
+        console.log('Something has gone horribly awry!');
     }
   };
 
-  // Receive info from Elm
-  if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i)) {
-    elmApp.ports.initMobile.subscribe(function (val) {
-      StartAudioContext(Tone.context, "#playButton");
-
-      elmApp.ports.synthToJS.subscribe(function (elmValue) {
-        synth = chooseSynth(elmValue);
-        var limiter = new Tone.Limiter(-6);
-
-        elmApp.ports.noteToJS.subscribe(function (elmNote) {
-          if (elmNote === "") {
-            synth.triggerRelease();
-          } else {
-            synth.triggerAttack(elmNote);
-          }
-        });
-      });
-    });
-  } else {
-    elmApp.ports.synthToJS.subscribe(function (elmValue) {
-      synth = chooseSynth(elmValue);
-      var limiter = new Tone.Limiter(-6);
-
-      elmApp.ports.noteToJS.subscribe(function (elmNote) {
-        if (elmNote === "") {
-          synth.triggerRelease();
-        } else {
-          synth.triggerAttack(elmNote);
-        }
-      });
-    });
+  function nav(browser) {
+    return navigator.userAgent.match(browser);
   }
 
-  console.log("Initialized app");
+  // Receive info from Elm
+  if (nav(/Android/i) || nav(/webOS/i) || nav(/iPhone/i) || nav(/iPad/i)) {
+    elmApp.ports.initMobile.subscribe(setMobileContext);
+  } else {
+    elmApp.ports.synthToJS.subscribe(synthSelection);
+  }
+
+  // elm callbacks
+  function setMobileContext(val) {
+    StartAudioContext(Tone.context, '#playButton');
+    elmApp.ports.synthToJS.subscribe(synthSelection);
+  }
+
+  function synthSelection(elmValue) {
+    synth = chooseSynth(elmValue);
+    elmApp.ports.noteToJS.subscribe(triggerNote);
+  }
+
+  function triggerNote(elmNote) {
+    elmNote === '' ? synth.triggerRelease() : synth.triggerAttack(elmNote);
+  }
+
+  console.log('Initialized app');
 });
 
 });

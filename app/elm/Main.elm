@@ -66,7 +66,7 @@ synthesizers =
     , "amsynth"
     , "membsynth"
     , "monosynth"
-    , "plucksynth"
+    , "square"
     ]
 
 

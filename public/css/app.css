@@ -4347,6 +4347,9 @@ label.panel-block {
   right: 0;
   left: 0; }
 
+.selectSynth .label {
+  user-select: none; }
+
 .selectSynth select {
   user-select: none;
   text-align: center;
