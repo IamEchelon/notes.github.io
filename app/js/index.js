@@ -1,71 +1,74 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   // Set and initialize elm constants
-  const node = document.getElementById("note-box");
+  const node = document.getElementById('note-box');
   const elmApp = Elm.Main.embed(node);
   var synth;
-  var chooseSynth;
   var context = new AudioContext();
 
-  // Selects & creates a new instance of tone synthesizer
-  chooseSynth = elmValue => {
-    switch (elmValue) {
-      case "duosynth":
-        var limiter = new Tone.Limiter(-14);
-        return new Tone.DuoSynth().connect(limiter).toMaster();
-      case "fmsynth":
-        return new Tone.FMSynth().toMaster();
-      case "membsynth":
-        return new Tone.MembraneSynth().toMaster();
-      case "monosynth":
-        return new Tone.MonoSynth().toMaster();
-      case "plucksynth":
-        return new Tone.PluckSynth().toMaster();
-      case "amsynth":
-        return new Tone.AMSynth().toMaster();
-      case "Please Select a Sound-":
-        return "None";
-      default:
-        console.log("Something has gone horribly awry!");
+  // Set up initial instruments
+  var limiter = new Tone.Limiter(-14);
+  const duosynth = new Tone.DuoSynth().connect(limiter).toMaster();
+  const fmsynth = new Tone.FMSynth().connect(limiter).toMaster();
+  const square = new Tone.Synth({
+    oscillator: {
+      type: 'sawtooth'
+    },
+    envelope: {
+      attack: 0.01,
+      decay: 0.2,
+      sustain: 0.2,
+      release: 0.2
     }
-  };
-
-  // Receive info from Elm
-  if (
-    navigator.userAgent.match(/Android/i) ||
-    navigator.userAgent.match(/webOS/i) ||
-    navigator.userAgent.match(/iPhone/i) ||
-    navigator.userAgent.match(/iPad/i)
-  ) {
-    elmApp.ports.initMobile.subscribe(val => {
-      StartAudioContext(Tone.context, "#playButton");
-
-      elmApp.ports.synthToJS.subscribe(elmValue => {
-        synth = chooseSynth(elmValue);
-        var limiter = new Tone.Limiter(-6);
-
-        elmApp.ports.noteToJS.subscribe(elmNote => {
-          if (elmNote === "") {
-            synth.triggerRelease();
-          } else {
-            synth.triggerAttack(elmNote);
-          }
-        });
-      });
-    });
-  } else {
-    elmApp.ports.synthToJS.subscribe(elmValue => {
-      synth = chooseSynth(elmValue);
-      var limiter = new Tone.Limiter(-6);
-
-      elmApp.ports.noteToJS.subscribe(elmNote => {
-        if (elmNote === "") {
-          synth.triggerRelease();
-        } else {
-          synth.triggerAttack(elmNote);
-        }
-      });
-    });
+  })
+    .connect(limiter)
+    .toMaster();
+  // Selects & creates a new instance of tone synthesizer
+  function chooseSynth(elmSynth) {
+    switch (elmSynth) {
+      case 'duosynth':
+        return duosynth;
+      case 'fmsynth':
+        return fmsynth;
+      case 'membsynth':
+        return new Tone.MembraneSynth().toMaster();
+      case 'monosynth':
+        return new Tone.MonoSynth().toMaster();
+      case 'square':
+        return square;
+      case 'amsynth':
+        return new Tone.AMSynth().toMaster();
+      case 'Please Select a Sound-':
+        return 'None';
+      default:
+        console.log('Something has gone horribly awry!');
+    }
   }
 
-  console.log("Initialized app");
+  function nav(browser) {
+    return navigator.userAgent.match(browser);
+  }
+
+  // Receive info from Elm
+  if (nav(/Android/i) || nav(/webOS/i) || nav(/iPhone/i) || nav(/iPad/i)) {
+    elmApp.ports.initMobile.subscribe(setMobileContext);
+  } else {
+    elmApp.ports.synthToJS.subscribe(synthSelection);
+  }
+
+  // elm callbacks
+  function setMobileContext(clear) {
+    StartAudioContext(Tone.context, '#playButton');
+    elmApp.ports.synthToJS.subscribe(synthSelection);
+  }
+
+  function synthSelection(elmSynth) {
+    synth = chooseSynth(elmSynth);
+    elmApp.ports.noteToJS.subscribe(triggerNote);
+  }
+
+  function triggerNote(elmNote) {
+    elmNote === '' ? synth.triggerRelease() : synth.triggerAttack(elmNote);
+  }
+
+  console.log('Initialized app');
 });

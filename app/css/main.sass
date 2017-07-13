@@ -28,8 +28,21 @@ $half-x-spacing: $xspacing / 2
 	flex-direction: row
 	flex-wrap: wrap-reverse	
 	padding-bottom: 150px
-	padding-left: $width/3
+	// padding-left: $width/3
 	margin: 40px auto 0
+	// margin-left: -170px
+
+#octave-1
+	// margin-top: 270px
+
+
+#octave-2
+	margin-left: -170px
+	margin-top: 270px
+	
+#octave-3
+	margin-left: -170px
+	margin-top: 270 * 2px
 
 .htmlKeys .htmlNote:nth-child(12n + 7)
 	margin-left: $spacer
@@ -45,43 +58,15 @@ $half-x-spacing: $xspacing / 2
 	animation: bounce 1s infinite alternate
 	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)
 
-Triangle
-Trapezoid
-Parallelogram
-Rhombus
-Pentagon
-Hexagon
-Heptagon
-Octagon
-Nonagon
-Decagon
-Bevel
-Rabbet
-Left arrow
-Right arrow
-Left Point
-Right Point
-Left Chevron
-Right Chevron
-Star
-Cross
-Message
-Close
-Frame
-Inset
-Custom Polygon
-Circle
-Ellipse
-Prefix
-webkit
-Demo Size
-
 
 .keydown
 	transition: all 100ms ease-in
 	transform: scale(0.8)
 
-
+.keyboard
+	display: flex
+	flex-direction: row
+	overflow-x: scroll
 
 // Transpot Panel Styles
 
@@ -95,9 +80,10 @@ Demo Size
 
 
 .selectSynth
-	.label
+	.label 
+		user-select: none
 		// margin-bottom: 0px
-
+	
 	select
 		user-select: none
 		text-align: center

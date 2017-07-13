@@ -9,6 +9,7 @@ import Dom.Scroll
 import Task
 import Shapes exposing (makeSvg)
 import MultiTouch exposing (..)
+import Note exposing (Note, noteDecoder)
 
 
 -- Main
@@ -26,19 +27,6 @@ main =
 
 
 -- Model
-
-
-{-| The core building block of our app. Each note in this notation system must be initialized with a a shape, a color, and numeric value that represents MIDI output
--}
-type alias Note =
-    { color : String
-    , shape : String
-    , value : Int
-    , tone_val : String
-    , svgPath : String
-    , hex_val : String
-    , animate : Bool
-    }
 
 
 type alias Model =
@@ -78,35 +66,8 @@ synthesizers =
     , "amsynth"
     , "membsynth"
     , "monosynth"
-    , "plucksynth"
+    , "square"
     ]
-
-
-{-| Parses our JSON data to setup each note
--}
-noteDecoder : Decoder Note
-noteDecoder =
-    ReadJson.map7 Note
-        (field "color" ReadJson.string)
-        (field "shape" ReadJson.string)
-        (field "value" ReadJson.int)
-        (field "tone_val" ReadJson.string)
-        (field "path" ReadJson.string)
-        (field "hex_value" ReadJson.string)
-        (succeed False)
-
-
-{-| Calls to the JSON api to retrieve our note values from a simple database
--}
-getNotes : Cmd Msg
-getNotes =
-    let
-        notesUrl =
-            "https://api.myjson.com/bins/u0bbj"
-    in
-        (ReadJson.list noteDecoder)
-            |> Http.get notesUrl
-            |> Http.send GetNotes
 
 
 httpErrorToMessage : Http.Error -> String
@@ -284,6 +245,19 @@ port noteToJS : String -> Cmd msg
 port synthToJS : String -> Cmd msg
 
 
+{-| Calls to the JSON api to retrieve our note values from a simple database
+-}
+getNotes : Cmd Msg
+getNotes =
+    let
+        notesUrl =
+            "https://api.myjson.com/bins/u0bbj"
+    in
+        (ReadJson.list noteDecoder)
+            |> Http.get notesUrl
+            |> Http.send GetNotes
+
+
 
 -- View
 
@@ -328,10 +302,18 @@ modalButton model =
 instrument : Model -> Html Msg
 instrument model =
     div [ class "instrument" ]
-        [ htmlKeys model
+        [ keyboard model
         , div
             [ class "panel" ]
             [ instPanel model ]
+        ]
+
+
+keyboard model =
+    div [ class "keyboard" ]
+        [ div [ id "octave-1" ] [ htmlKeys model ]
+        , div [ id "octave-2" ] [ htmlKeys model ]
+        , div [ id "octave-3" ] [ htmlKeys model ]
         ]
 
 
