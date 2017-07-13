@@ -1,42 +1,42 @@
 module.exports = {
   config: {
     paths: {
-      watched: ["app"]
+      watched: ['app']
     },
 
     files: {
       javascripts: {
         joinTo: {
-          "js/vendor.js": /^(?!app)/,
-          "js/app.js": /^app/
+          'js/vendor.js': /^(?!app)/,
+          'js/app.js': /^app/
         }
       },
       stylesheets: {
-        joinTo: "css/app.css"
+        joinTo: 'css/app.css'
       }
     },
 
     plugins: {
       elmBrunch: {
-        mainModules: ["app/elm/Main.elm"],
-        outputFolder: "public/js/",
-        parameters: ["--warn", "--debug"]
+        mainModules: ['app/elm/Main.elm'],
+        outputFolder: 'public/js/',
+        parameters: ['--warn', '--debug']
       },
       sass: {
-        mode: "native",
+        mode: 'native',
         options: {
-          includePaths: ["node_modules/bulma"]
+          includePaths: ['node_modules/bulma']
         }
       },
       babel: {
-        presets: ["es2015"],
+        presets: ['es2015'],
         ignore: [/^elm/]
-      },
-      browserSync: {
-        port: 3333,
-        logLevel: "debug",
-        notify: false
       }
+      // browserSync: {
+      //   port: 3333,
+      //   logLevel: "debug",
+      //   notify: false
+      // }
     }
   }
 };

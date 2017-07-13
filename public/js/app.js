@@ -167,7 +167,6 @@ document.addEventListener('DOMContentLoaded', function () {
   var node = document.getElementById('note-box');
   var elmApp = Elm.Main.embed(node);
   var synth;
-  var chooseSynth;
   var context = new AudioContext();
 
   // Set up initial instruments
@@ -185,10 +184,9 @@ document.addEventListener('DOMContentLoaded', function () {
       release: 0.2
     }
   }).connect(limiter).toMaster();
-
   // Selects & creates a new instance of tone synthesizer
-  chooseSynth = function chooseSynth(elmValue) {
-    switch (elmValue) {
+  function chooseSynth(elmSynth) {
+    switch (elmSynth) {
       case 'duosynth':
         return duosynth;
       case 'fmsynth':
@@ -206,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
       default:
         console.log('Something has gone horribly awry!');
     }
-  };
+  }
 
   function nav(browser) {
     return navigator.userAgent.match(browser);
@@ -220,13 +218,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // elm callbacks
-  function setMobileContext(val) {
+  function setMobileContext(clear) {
     StartAudioContext(Tone.context, '#playButton');
     elmApp.ports.synthToJS.subscribe(synthSelection);
   }
 
-  function synthSelection(elmValue) {
-    synth = chooseSynth(elmValue);
+  function synthSelection(elmSynth) {
+    synth = chooseSynth(elmSynth);
     elmApp.ports.noteToJS.subscribe(triggerNote);
   }
 
@@ -239,7 +237,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-require.register("___globals___", function(exports, require, module) {
+require.register("js/instruments.js", function(exports, require, module) {
+"use strict";
+
+});
+
+require.alias("buffer/index.js", "buffer");require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 

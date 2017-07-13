@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const node = document.getElementById('note-box');
   const elmApp = Elm.Main.embed(node);
   var synth;
-  var chooseSynth;
   var context = new AudioContext();
 
   // Set up initial instruments
@@ -23,9 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
   })
     .connect(limiter)
     .toMaster();
-
   // Selects & creates a new instance of tone synthesizer
-  chooseSynth = elmSynth => {
+  function chooseSynth(elmSynth) {
     switch (elmSynth) {
       case 'duosynth':
         return duosynth;
@@ -44,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
       default:
         console.log('Something has gone horribly awry!');
     }
-  };
+  }
 
   function nav(browser) {
     return navigator.userAgent.match(browser);
@@ -58,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // elm callbacks
-  function setMobileContext(val) {
+  function setMobileContext(clear) {
     StartAudioContext(Tone.context, '#playButton');
     elmApp.ports.synthToJS.subscribe(synthSelection);
   }
