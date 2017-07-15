@@ -1,42 +1,29 @@
+const inst = require('./synths');
+// const Tone = require('tone');
+
 document.addEventListener('DOMContentLoaded', () => {
   // Set and initialize elm constants
   const node = document.getElementById('note-box');
   const elmApp = Elm.Main.embed(node);
+  const context = new AudioContext();
   var synth;
-  var context = new AudioContext();
 
-  // Set up initial instruments
-  var limiter = new Tone.Limiter(-14);
-  const duosynth = new Tone.DuoSynth().connect(limiter).toMaster();
-  const fmsynth = new Tone.FMSynth().connect(limiter).toMaster();
-  const square = new Tone.Synth({
-    oscillator: {
-      type: 'sawtooth'
-    },
-    envelope: {
-      attack: 0.01,
-      decay: 0.2,
-      sustain: 0.2,
-      release: 0.2
-    }
-  })
-    .connect(limiter)
-    .toMaster();
   // Selects & creates a new instance of tone synthesizer
   function chooseSynth(elmSynth) {
     switch (elmSynth) {
       case 'duosynth':
-        return duosynth;
+        console.log(inst.duosynth());
+        return inst.duosynth();
       case 'fmsynth':
-        return fmsynth;
-      case 'membsynth':
-        return new Tone.MembraneSynth().toMaster();
-      case 'monosynth':
-        return new Tone.MonoSynth().toMaster();
-      case 'square':
-        return square;
+        return inst.fmsynth();
       case 'amsynth':
-        return new Tone.AMSynth().toMaster();
+        return inst.amsynth();
+      case 'membsynth':
+        return inst.membsynth();
+      case 'monosynth':
+        return inst.monosynth();
+      case 'square':
+        return inst.square();
       case 'Please Select a Sound-':
         return 'None';
       default:
@@ -49,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Receive info from Elm
-  if (nav(/Android/i) || nav(/webOS/i) || nav(/iPhone/i) || nav(/iPad/i)) {
+  if (nav(/Android/i) || nav(/iPhone/i) || nav(/iPad/i)) {
     elmApp.ports.initMobile.subscribe(setMobileContext);
   } else {
     elmApp.ports.synthToJS.subscribe(synthSelection);

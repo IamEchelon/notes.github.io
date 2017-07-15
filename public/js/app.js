@@ -162,43 +162,32 @@ require.register("elm/Main.elm", function(exports, require, module) {
 ;require.register("js/index.js", function(exports, require, module) {
 'use strict';
 
+var inst = require('./synths');
+// const Tone = require('tone');
+
 document.addEventListener('DOMContentLoaded', function () {
   // Set and initialize elm constants
   var node = document.getElementById('note-box');
   var elmApp = Elm.Main.embed(node);
-  var synth;
   var context = new AudioContext();
+  var synth;
 
-  // Set up initial instruments
-  var limiter = new Tone.Limiter(-14);
-  var duosynth = new Tone.DuoSynth().connect(limiter).toMaster();
-  var fmsynth = new Tone.FMSynth().connect(limiter).toMaster();
-  var square = new Tone.Synth({
-    oscillator: {
-      type: 'sawtooth'
-    },
-    envelope: {
-      attack: 0.01,
-      decay: 0.2,
-      sustain: 0.2,
-      release: 0.2
-    }
-  }).connect(limiter).toMaster();
   // Selects & creates a new instance of tone synthesizer
   function chooseSynth(elmSynth) {
     switch (elmSynth) {
       case 'duosynth':
-        return duosynth;
+        console.log(inst.duosynth());
+        return inst.duosynth();
       case 'fmsynth':
-        return fmsynth;
-      case 'membsynth':
-        return new Tone.MembraneSynth().toMaster();
-      case 'monosynth':
-        return new Tone.MonoSynth().toMaster();
-      case 'square':
-        return square;
+        return inst.fmsynth();
       case 'amsynth':
-        return new Tone.AMSynth().toMaster();
+        return inst.amsynth();
+      case 'membsynth':
+        return inst.membsynth();
+      case 'monosynth':
+        return inst.monosynth();
+      case 'square':
+        return inst.square();
       case 'Please Select a Sound-':
         return 'None';
       default:
@@ -211,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Receive info from Elm
-  if (nav(/Android/i) || nav(/webOS/i) || nav(/iPhone/i) || nav(/iPad/i)) {
+  if (nav(/Android/i) || nav(/iPhone/i) || nav(/iPad/i)) {
     elmApp.ports.initMobile.subscribe(setMobileContext);
   } else {
     elmApp.ports.synthToJS.subscribe(synthSelection);
@@ -237,8 +226,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-require.register("js/instruments.js", function(exports, require, module) {
-"use strict";
+require.register("js/synths.js", function(exports, require, module) {
+'use strict';
+
+var Tone = require('tone');
+var limiter = new Tone.Limiter(-14);
+
+// create instruments
+function duosynth() {
+  return new Tone.DuoSynth().toMaster();
+}
+
+function fmsynth() {
+  return new Tone.FMSynth().connect(limiter).toMaster();
+}
+
+function amsynth() {
+  return new Tone.AMSynth().connect(limiter).toMaster();
+}
+
+function membsynth() {
+  return new Tone.MembraneSynth().connect(limiter).toMaster();
+}
+
+function monosynth() {
+  return new Tone.MonoSynth().connect(limiter).toMaster();
+}
+
+function square() {
+  var sq = new Tone.Synth({
+    oscillator: {
+      type: 'sawtooth'
+    },
+    envelope: {
+      attack: 0.01,
+      decay: 0.2,
+      sustain: 0.2,
+      release: 0.2
+    }
+  }).connect(limiter).toMaster();
+  return sq;
+}
+
+// export
+module.exports = {
+  duosynth: duosynth,
+  fmsynth: fmsynth,
+  amsynth: amsynth,
+  membsynth: membsynth,
+  monosynth: monosynth,
+  square: square
+};
 
 });
 

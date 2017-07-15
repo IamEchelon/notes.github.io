@@ -11,7 +11,7 @@ built today using computer software and modern tools?
 - [x] Replace Gulp with Brunch for streamlined build system
 - [x] Add Logo
 - [ ] Fix scroll positioning issue
-- [ ] Add full key layout
+- [x] Add full key layout
 - [ ] Replace JS with typescript
 - [ ] Correct sound clipping issue
 - [ ] Setup grid switching for note view
