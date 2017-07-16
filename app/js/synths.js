@@ -1,26 +1,28 @@
-const Tone = require('tone');
-const limiter = new Tone.Limiter(-14);
+const Tone = require('tone')
+const limiter = new Tone.Limiter(-14)
 
 // create instruments
 function duosynth() {
-  return new Tone.DuoSynth().toMaster();
+  return new Tone.DuoSynth().toMaster()
 }
 
 function fmsynth() {
-  return new Tone.FMSynth().connect(limiter).toMaster();
+  return new Tone.FMSynth().connect(limiter).toMaster()
 }
 
 function amsynth() {
-  return new Tone.AMSynth().connect(limiter).toMaster();
+  return new Tone.AMSynth().connect(limiter).toMaster()
 }
 
 function membsynth() {
-  return new Tone.MembraneSynth().connect(limiter).toMaster();
+  return new Tone.MembraneSynth().connect(limiter).toMaster()
 }
 
 function monosynth() {
-  return new Tone.MonoSynth().connect(limiter).toMaster();
+  return new Tone.MonoSynth().connect(limiter).toMaster()
 }
+
+function someFunc() {}
 
 function square() {
   let sq = new Tone.Synth({
@@ -35,8 +37,8 @@ function square() {
     }
   })
     .connect(limiter)
-    .toMaster();
-  return sq;
+    .toMaster()
+  return sq
 }
 
 // export
@@ -47,4 +49,4 @@ module.exports = {
   membsynth: membsynth,
   monosynth: monosynth,
   square: square
-};
+}

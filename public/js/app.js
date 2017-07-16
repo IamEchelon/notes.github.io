@@ -170,13 +170,12 @@ document.addEventListener('DOMContentLoaded', function () {
   var node = document.getElementById('note-box');
   var elmApp = Elm.Main.embed(node);
   var context = new AudioContext();
-  var synth;
+  var synth = void 0;
 
   // Selects & creates a new instance of tone synthesizer
   function chooseSynth(elmSynth) {
     switch (elmSynth) {
       case 'duosynth':
-        console.log(inst.duosynth());
         return inst.duosynth();
       case 'fmsynth':
         return inst.fmsynth();
@@ -253,6 +252,8 @@ function monosynth() {
   return new Tone.MonoSynth().connect(limiter).toMaster();
 }
 
+function someFunc() {}
+
 function square() {
   var sq = new Tone.Synth({
     oscillator: {
@@ -280,7 +281,7 @@ module.exports = {
 
 });
 
-require.alias("buffer/index.js", "buffer");require.register("___globals___", function(exports, require, module) {
+require.alias("brunch/node_modules/buffer/index.js", "buffer");require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 
