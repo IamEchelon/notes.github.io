@@ -162,8 +162,8 @@ require.register("elm/Main.elm", function(exports, require, module) {
 ;require.register("js/index.js", function(exports, require, module) {
 'use strict';
 
-var inst = require('./synths');
-// const Tone = require('tone');
+var Inst = require('./synths');
+var inst = new Inst();
 
 document.addEventListener('DOMContentLoaded', function () {
   // Set and initialize elm constants
@@ -228,60 +228,58 @@ document.addEventListener('DOMContentLoaded', function () {
 require.register("js/synths.js", function(exports, require, module) {
 'use strict';
 
-var Tone = require('tone');
-var limiter = new Tone.Limiter(-14);
+function Instr() {
+  var Tone = require('tone');
+  var limiter = new Tone.Limiter(-14);
 
-// create instruments
-function duosynth() {
-  return new Tone.DuoSynth().toMaster();
-}
+  // create instruments
+  this.duosynth = function () {
+    return new Tone.DuoSynth().connect(limiter).toMaster();
+  };
 
-function fmsynth() {
-  return new Tone.FMSynth().connect(limiter).toMaster();
-}
+  this.fmsynth = function () {
+    return new Tone.FMSynth().connect(limiter).toMaster();
+  };
 
-function amsynth() {
-  return new Tone.AMSynth().connect(limiter).toMaster();
-}
+  this.amsynth = function () {
+    return new Tone.AMSynth().connect(limiter).toMaster();
+  };
 
-function membsynth() {
-  return new Tone.MembraneSynth().connect(limiter).toMaster();
-}
+  this.membsynth = function () {
+    return new Tone.MembraneSynth().connect(limiter).toMaster();
+  };
 
-function monosynth() {
-  return new Tone.MonoSynth().connect(limiter).toMaster();
-}
+  this.monosynth = function () {
+    return new Tone.MonoSynth().connect(limiter).toMaster();
+  };
 
-function someFunc() {}
+  this.square = function () {
+    var attack = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
+    var decay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.2;
+    var sustain = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.2;
+    var release = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.2;
 
-function square() {
-  var sq = new Tone.Synth({
-    oscillator: {
-      type: 'sawtooth'
-    },
-    envelope: {
-      attack: 0.01,
-      decay: 0.2,
-      sustain: 0.2,
-      release: 0.2
-    }
-  }).connect(limiter).toMaster();
-  return sq;
+    var sq = new Tone.Synth({
+      oscillator: {
+        type: 'sawtooth'
+      },
+      envelope: {
+        attack: attack,
+        decay: decay,
+        sustain: sustain,
+        release: release
+      }
+    }).connect(limiter).toMaster();
+    return sq;
+  };
 }
 
 // export
-module.exports = {
-  duosynth: duosynth,
-  fmsynth: fmsynth,
-  amsynth: amsynth,
-  membsynth: membsynth,
-  monosynth: monosynth,
-  square: square
-};
+module.exports = Instr;
 
 });
 
-require.alias("brunch/node_modules/buffer/index.js", "buffer");require.register("___globals___", function(exports, require, module) {
+require.alias("buffer/index.js", "buffer");require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 

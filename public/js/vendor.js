@@ -148,8 +148,8 @@ var __makeRelativeRequire = function(require, mappings, pref) {
   }
 };
 
-require.register("brunch/node_modules/base64-js/index.js", function(exports, require, module) {
-  require = __makeRelativeRequire(require, {}, "brunch/node_modules/base64-js");
+require.register("base64-js/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "base64-js");
   (function() {
     'use strict'
 
@@ -268,8 +268,8 @@ function fromByteArray (uint8) {
   })();
 });
 
-require.register("brunch/node_modules/buffer/index.js", function(exports, require, module) {
-  require = __makeRelativeRequire(require, {}, "brunch/node_modules/buffer");
+require.register("buffer/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "buffer");
   var _Buffer = require('buffer'); var Buffer = _Buffer && _Buffer.Buffer;
 (function() {
     /*!
@@ -1730,8 +1730,8 @@ function blitBuffer (src, dst, offset, length) {
   })();
 });
 
-require.register("brunch/node_modules/ieee754/index.js", function(exports, require, module) {
-  require = __makeRelativeRequire(require, {}, "brunch/node_modules/ieee754");
+require.register("ieee754/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "ieee754");
   (function() {
     exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -1820,8 +1820,8 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   })();
 });
 
-require.register("brunch/node_modules/isarray/index.js", function(exports, require, module) {
-  require = __makeRelativeRequire(require, {}, "brunch/node_modules/isarray");
+require.register("isarray/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "isarray");
   (function() {
     var toString = {}.toString;
 
@@ -24275,7 +24275,7 @@ require.register("tone/build/Tone.js", function(exports, require, module) {
 }));
   })();
 });
-require.alias("brunch/node_modules/buffer/index.js", "buffer");
+require.alias("buffer/index.js", "buffer");
 require.alias("tone/build/Tone.js", "tone");require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');

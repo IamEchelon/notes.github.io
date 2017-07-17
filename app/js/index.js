@@ -1,5 +1,5 @@
-const inst = require('./synths')
-// const Tone = require('tone');
+const Inst = require('./synths')
+const inst = new Inst()
 
 document.addEventListener('DOMContentLoaded', () => {
   // Set and initialize elm constants
