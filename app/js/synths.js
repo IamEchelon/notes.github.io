@@ -1,29 +1,32 @@
-function Instr() {
-  const Tone = require('tone')
-  const limiter = new Tone.Limiter(-14)
+// This is where we construct our variouse ToneJS instruments
+const Tone = require('tone')
+
+module.exports.select = {
+  limiter: new Tone.Limiter(-14),
 
   // create instruments
-  this.duosynth = function() {
-    return new Tone.DuoSynth().connect(limiter).toMaster()
-  }
+  duosynth: function() {
+    return new Tone.DuoSynth().connect(this.limiter).toMaster()
+  },
 
-  this.fmsynth = function() {
-    return new Tone.FMSynth().connect(limiter).toMaster()
-  }
+  fmsynth: function() {
+    return new Tone.FMSynth().connect(this.limiter).toMaster()
+  },
 
-  this.amsynth = function() {
-    return new Tone.AMSynth().connect(limiter).toMaster()
-  }
+  amsynth: function() {
+    return new Tone.AMSynth().connect(this.limiter).toMaster()
+  },
 
-  this.membsynth = function() {
-    return new Tone.MembraneSynth().connect(limiter).toMaster()
-  }
+  membsynth: function() {
+    return new Tone.MembraneSynth().connect(this.limiter).toMaster()
+  },
 
-  this.monosynth = function() {
-    return new Tone.MonoSynth().connect(limiter).toMaster()
-  }
+  monosynth: function() {
+    return new Tone.MonoSynth().connect(this.limiter).toMaster()
+  },
 
-  this.square = function(
+  square: function(
+    type = 'sawtooth',
     attack = 0.01,
     decay = 0.2,
     sustain = 0.2,
@@ -31,7 +34,7 @@ function Instr() {
   ) {
     let sq = new Tone.Synth({
       oscillator: {
-        type: 'sawtooth'
+        type: type
       },
       envelope: {
         attack: attack,
@@ -40,11 +43,8 @@ function Instr() {
         release: release
       }
     })
-      .connect(limiter)
+      .connect(this.limiter)
       .toMaster()
     return sq
   }
 }
-
-// export
-module.exports = Instr

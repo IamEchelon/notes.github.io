@@ -1,5 +1,5 @@
-const Inst = require('./synths')
-const inst = new Inst()
+const inst = require('./synths')
+console.log(inst.select.duosynth())
 
 document.addEventListener('DOMContentLoaded', () => {
   // Set and initialize elm constants
@@ -12,17 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function chooseSynth(elmSynth) {
     switch (elmSynth) {
       case 'duosynth':
-        return inst.duosynth()
+        return inst.select.duosynth()
       case 'fmsynth':
-        return inst.fmsynth()
+        return inst.select.fmsynth()
       case 'amsynth':
-        return inst.amsynth()
+        return inst.select.amsynth()
       case 'membsynth':
-        return inst.membsynth()
+        return inst.select.membsynth()
       case 'monosynth':
-        return inst.monosynth()
+        return inst.select.monosynth()
       case 'square':
-        return inst.square()
+        return inst.select.square()
       case 'Please Select a Sound-':
         return 'None'
       default:

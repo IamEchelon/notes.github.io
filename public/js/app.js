@@ -162,8 +162,8 @@ require.register("elm/Main.elm", function(exports, require, module) {
 ;require.register("js/index.js", function(exports, require, module) {
 'use strict';
 
-var Inst = require('./synths');
-var inst = new Inst();
+var inst = require('./synths');
+console.log(inst.select.duosynth());
 
 document.addEventListener('DOMContentLoaded', function () {
   // Set and initialize elm constants
@@ -176,17 +176,17 @@ document.addEventListener('DOMContentLoaded', function () {
   function chooseSynth(elmSynth) {
     switch (elmSynth) {
       case 'duosynth':
-        return inst.duosynth();
+        return inst.select.duosynth();
       case 'fmsynth':
-        return inst.fmsynth();
+        return inst.select.fmsynth();
       case 'amsynth':
-        return inst.amsynth();
+        return inst.select.amsynth();
       case 'membsynth':
-        return inst.membsynth();
+        return inst.select.membsynth();
       case 'monosynth':
-        return inst.monosynth();
+        return inst.select.monosynth();
       case 'square':
-        return inst.square();
+        return inst.select.square();
       case 'Please Select a Sound-':
         return 'None';
       default:
@@ -228,40 +228,43 @@ document.addEventListener('DOMContentLoaded', function () {
 require.register("js/synths.js", function(exports, require, module) {
 'use strict';
 
-function Instr() {
-  var Tone = require('tone');
-  var limiter = new Tone.Limiter(-14);
+// This is where we construct our variouse ToneJS instruments
+var Tone = require('tone');
+
+module.exports.select = {
+  limiter: new Tone.Limiter(-14),
 
   // create instruments
-  this.duosynth = function () {
-    return new Tone.DuoSynth().connect(limiter).toMaster();
-  };
+  duosynth: function duosynth() {
+    return new Tone.DuoSynth().connect(this.limiter).toMaster();
+  },
 
-  this.fmsynth = function () {
-    return new Tone.FMSynth().connect(limiter).toMaster();
-  };
+  fmsynth: function fmsynth() {
+    return new Tone.FMSynth().connect(this.limiter).toMaster();
+  },
 
-  this.amsynth = function () {
-    return new Tone.AMSynth().connect(limiter).toMaster();
-  };
+  amsynth: function amsynth() {
+    return new Tone.AMSynth().connect(this.limiter).toMaster();
+  },
 
-  this.membsynth = function () {
-    return new Tone.MembraneSynth().connect(limiter).toMaster();
-  };
+  membsynth: function membsynth() {
+    return new Tone.MembraneSynth().connect(this.limiter).toMaster();
+  },
 
-  this.monosynth = function () {
-    return new Tone.MonoSynth().connect(limiter).toMaster();
-  };
+  monosynth: function monosynth() {
+    return new Tone.MonoSynth().connect(this.limiter).toMaster();
+  },
 
-  this.square = function () {
-    var attack = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0.01;
-    var decay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.2;
-    var sustain = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.2;
-    var release = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.2;
+  square: function square() {
+    var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'sawtooth';
+    var attack = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.01;
+    var decay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.2;
+    var sustain = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.2;
+    var release = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0.2;
 
     var sq = new Tone.Synth({
       oscillator: {
-        type: 'sawtooth'
+        type: type
       },
       envelope: {
         attack: attack,
@@ -269,13 +272,10 @@ function Instr() {
         sustain: sustain,
         release: release
       }
-    }).connect(limiter).toMaster();
+    }).connect(this.limiter).toMaster();
     return sq;
-  };
-}
-
-// export
-module.exports = Instr;
+  }
+};
 
 });
 
