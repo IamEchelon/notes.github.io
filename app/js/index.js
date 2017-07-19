@@ -41,9 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // elm callbacks
-  function setMobileContext(noop) {
-    StartAudioContext(Tone.context, '#playButton')
-    elmApp.ports.synthToJS.subscribe(synthSelection)
+  function triggerNote(elmNote) {
+    elmNote === '' ? synth.triggerRelease() : synth.triggerAttack(elmNote)
   }
 
   function synthSelection(elmSynth) {
@@ -51,8 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
     elmApp.ports.noteToJS.subscribe(triggerNote)
   }
 
-  function triggerNote(elmNote) {
-    elmNote === '' ? synth.triggerRelease() : synth.triggerAttack(elmNote)
+  function setMobileContext(noop) {
+    StartAudioContext(Tone.context, '#playButton')
+    elmApp.ports.synthToJS.subscribe(synthSelection)
   }
 
   console.log('Initialized app')
