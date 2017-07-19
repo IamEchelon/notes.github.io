@@ -1,5 +1,5 @@
 const inst = require('./synths')
-console.log(inst.select.duosynth())
+const browser = require('./browser')
 
 document.addEventListener('DOMContentLoaded', () => {
   // Set and initialize elm constants
@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const elmApp = Elm.Main.embed(node)
   const context = new AudioContext()
   let synth
+  const android = browser.select.android()
+  const iphone = browser.select.iphone()
+  const ipad = browser.select.ipad()
 
   // Selects & creates a new instance of tone synthesizer
   function chooseSynth(elmSynth) {
@@ -22,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'monosynth':
         return inst.select.monosynth()
       case 'square':
-        return inst.select.square()
+        return inst.select.square('square')
       case 'Please Select a Sound-':
         return 'None'
       default:
@@ -30,19 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function nav(browser) {
-    return navigator.userAgent.match(browser)
-  }
-
   // Receive info from Elm
-  if (nav(/Android/i) || nav(/iPhone/i) || nav(/iPad/i)) {
+  if (android || iphone || ipad) {
     elmApp.ports.initMobile.subscribe(setMobileContext)
   } else {
     elmApp.ports.synthToJS.subscribe(synthSelection)
   }
 
   // elm callbacks
-  function setMobileContext(clear) {
+  function setMobileContext(noop) {
     StartAudioContext(Tone.context, '#playButton')
     elmApp.ports.synthToJS.subscribe(synthSelection)
   }

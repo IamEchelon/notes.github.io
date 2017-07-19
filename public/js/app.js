@@ -159,11 +159,31 @@ require.register("elm/Main.elm", function(exports, require, module) {
 
 });
 
-;require.register("js/index.js", function(exports, require, module) {
+;require.register("js/browser.js", function(exports, require, module) {
+"use strict";
+
+module.exports.select = {
+  navSelect: function navSelect(browser) {
+    return navigator.userAgent.match(browser);
+  },
+  android: function android() {
+    return this.navSelect(/Android/i);
+  },
+  iphone: function iphone() {
+    return this.navSelect(/iPhone/i);
+  },
+  ipad: function ipad() {
+    return this.navSelect(/iPad/i);
+  }
+};
+
+});
+
+require.register("js/index.js", function(exports, require, module) {
 'use strict';
 
 var inst = require('./synths');
-console.log(inst.select.duosynth());
+var browser = require('./browser');
 
 document.addEventListener('DOMContentLoaded', function () {
   // Set and initialize elm constants
@@ -171,6 +191,9 @@ document.addEventListener('DOMContentLoaded', function () {
   var elmApp = Elm.Main.embed(node);
   var context = new AudioContext();
   var synth = void 0;
+  var android = browser.select.android();
+  var iphone = browser.select.iphone();
+  var ipad = browser.select.ipad();
 
   // Selects & creates a new instance of tone synthesizer
   function chooseSynth(elmSynth) {
@@ -186,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'monosynth':
         return inst.select.monosynth();
       case 'square':
-        return inst.select.square();
+        return inst.select.square('square');
       case 'Please Select a Sound-':
         return 'None';
       default:
@@ -194,19 +217,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function nav(browser) {
-    return navigator.userAgent.match(browser);
-  }
-
   // Receive info from Elm
-  if (nav(/Android/i) || nav(/iPhone/i) || nav(/iPad/i)) {
+  if (android || iphone || ipad) {
     elmApp.ports.initMobile.subscribe(setMobileContext);
   } else {
     elmApp.ports.synthToJS.subscribe(synthSelection);
   }
 
   // elm callbacks
-  function setMobileContext(clear) {
+  function setMobileContext(noop) {
     StartAudioContext(Tone.context, '#playButton');
     elmApp.ports.synthToJS.subscribe(synthSelection);
   }
@@ -238,23 +257,18 @@ module.exports.select = {
   duosynth: function duosynth() {
     return new Tone.DuoSynth().connect(this.limiter).toMaster();
   },
-
   fmsynth: function fmsynth() {
     return new Tone.FMSynth().connect(this.limiter).toMaster();
   },
-
   amsynth: function amsynth() {
     return new Tone.AMSynth().connect(this.limiter).toMaster();
   },
-
   membsynth: function membsynth() {
     return new Tone.MembraneSynth().connect(this.limiter).toMaster();
   },
-
   monosynth: function monosynth() {
     return new Tone.MonoSynth().connect(this.limiter).toMaster();
   },
-
   square: function square() {
     var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'sawtooth';
     var attack = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.01;

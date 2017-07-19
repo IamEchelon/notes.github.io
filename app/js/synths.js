@@ -5,27 +5,27 @@ module.exports.select = {
   limiter: new Tone.Limiter(-14),
 
   // create instruments
-  duosynth: function() {
+  duosynth() {
     return new Tone.DuoSynth().connect(this.limiter).toMaster()
   },
 
-  fmsynth: function() {
+  fmsynth() {
     return new Tone.FMSynth().connect(this.limiter).toMaster()
   },
 
-  amsynth: function() {
+  amsynth() {
     return new Tone.AMSynth().connect(this.limiter).toMaster()
   },
 
-  membsynth: function() {
+  membsynth() {
     return new Tone.MembraneSynth().connect(this.limiter).toMaster()
   },
 
-  monosynth: function() {
+  monosynth() {
     return new Tone.MonoSynth().connect(this.limiter).toMaster()
   },
 
-  square: function(
+  square(
     type = 'sawtooth',
     attack = 0.01,
     decay = 0.2,
