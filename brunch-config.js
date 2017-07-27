@@ -32,11 +32,6 @@ module.exports = {
         presets: ['es2015'],
         ignore: [/^elm/]
       }
-      // browserSync: {
-      //   port: 3333,
-      //   logLevel: "debug",
-      //   notify: false
-      // }
     }
   }
 };
