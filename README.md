@@ -12,7 +12,6 @@ built today using computer software and modern tools?
 - [x] Add Logo
 - [ ] Fix scroll positioning issue
 - [x] Add full key layout
-- [ ] Replace JS with typescript
 - [ ] Correct sound clipping issue
 - [ ] Setup grid switching for note view
 - [ ] Add settings to instruments
@@ -20,5 +19,5 @@ built today using computer software and modern tools?
 - [ ] Setup mobile styles and features
 - [x] Fix clip path to correct note overlap
 - [ ] Covert styles over to bulma where applicable ***in progess***
-- [ ] modularize JS ***in progress***
+- [x] modularize JS 
 - [x] Prevent text select on instruments
