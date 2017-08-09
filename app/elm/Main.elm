@@ -177,7 +177,7 @@ update msg model =
                     | signal = ""
                     , notes = List.map updateAnimate model.notes
                   }
-                , noteToJS ""
+                , stopNote ""
                 )
 
         MouseUp ->
@@ -190,7 +190,7 @@ update msg model =
                     , mousedown = False
                     , notes = List.map updateAnimate model.notes
                   }
-                , noteToJS ""
+                , stopNote ""
                 )
 
         -- Touch Events
@@ -220,7 +220,7 @@ update msg model =
                     , touchEngaged = False
                     , notes = List.map updateAnimate model.notes
                   }
-                , noteToJS ""
+                , stopNote ""
                 )
 
         CancelTouch note ->
@@ -240,6 +240,9 @@ port initMobile : String -> Cmd msg
 
 
 port noteToJS : String -> Cmd msg
+
+
+port stopNote : String -> Cmd msg
 
 
 port synthToJS : String -> Cmd msg

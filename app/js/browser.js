@@ -1,4 +1,4 @@
-module.exports.select = {
+export const browser = {
   navSelect(browser) {
     return navigator.userAgent.match(browser)
   },

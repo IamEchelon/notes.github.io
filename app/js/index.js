@@ -1,5 +1,5 @@
-const inst = require('./synths')
-const browser = require('./browser')
+import { select } from './synths'
+import { browser } from './browser'
 
 document.addEventListener('DOMContentLoaded', () => {
   // Set and initialize elm constants
@@ -7,25 +7,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const elmApp = Elm.Main.embed(node)
   const context = new AudioContext()
   let synth
-  const android = browser.select.android()
-  const iphone = browser.select.iphone()
-  const ipad = browser.select.ipad()
+  const android = browser.android()
+  const iphone = browser.iphone()
+  const ipad = browser.ipad()
 
   // Selects & creates a new instance of tone synthesizer
-  function chooseSynth(elmSynth) {
+  const chooseSynth = elmSynth => {
     switch (elmSynth) {
       case 'duosynth':
-        return inst.select.duosynth()
+        return select.duosynth()
       case 'fmsynth':
-        return inst.select.fmsynth()
+        return select.fmsynth()
       case 'amsynth':
-        return inst.select.amsynth()
+        return select.amsynth()
       case 'membsynth':
-        return inst.select.membsynth()
+        return select.membsynth()
       case 'monosynth':
-        return inst.select.monosynth()
+        return select.monosynth()
       case 'square':
-        return inst.select.square('square')
+        return select.square('square')
       case 'Please Select a Sound-':
         return 'None'
       default:
@@ -41,16 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // elm callbacks
-  function triggerNote(elmNote) {
-    elmNote === '' ? synth.triggerRelease() : synth.triggerAttack(elmNote)
-  }
+  const triggerNote = elmNote => synth.triggerAttack(elmNote)
+
+  const stopNote = noop => synth.triggerRelease()
 
   function synthSelection(elmSynth) {
     synth = chooseSynth(elmSynth)
     elmApp.ports.noteToJS.subscribe(triggerNote)
+    elmApp.ports.stopNote.subscribe(stopNote)
   }
 
-  function setMobileContext(noop) {
+  const setMobileContext = noop => {
     StartAudioContext(Tone.context, '#playButton')
     elmApp.ports.synthToJS.subscribe(synthSelection)
   }

@@ -1,28 +1,28 @@
 // This is where we construct our variouse ToneJS instruments
-const Tone = require('tone')
+import Tone from 'tone'
 
-module.exports.select = {
+export const select = {
   limiter: new Tone.Limiter(-14),
 
   // create instruments
   duosynth() {
-    return new Tone.DuoSynth().connect(this.limiter).toMaster()
+    return new Tone.DuoSynth().toMaster()
   },
 
   fmsynth() {
-    return new Tone.FMSynth().connect(this.limiter).toMaster()
+    return new Tone.FMSynth().toMaster()
   },
 
   amsynth() {
-    return new Tone.AMSynth().connect(this.limiter).toMaster()
+    return new Tone.AMSynth().toMaster()
   },
 
   membsynth() {
-    return new Tone.MembraneSynth().connect(this.limiter).toMaster()
+    return new Tone.MembraneSynth().toMaster()
   },
 
   monosynth() {
-    return new Tone.MonoSynth().connect(this.limiter).toMaster()
+    return new Tone.MonoSynth().toMaster()
   },
 
   square(

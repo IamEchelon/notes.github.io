@@ -9969,6 +9969,11 @@ var _user$project$Main$noteToJS = _elm_lang$core$Native_Platform.outgoingPort(
 	function (v) {
 		return v;
 	});
+var _user$project$Main$stopNote = _elm_lang$core$Native_Platform.outgoingPort(
+	'stopNote',
+	function (v) {
+		return v;
+	});
 var _user$project$Main$synthToJS = _elm_lang$core$Native_Platform.outgoingPort(
 	'synthToJS',
 	function (v) {
@@ -10469,7 +10474,7 @@ var _user$project$Main$update = F2(
 							signal: '',
 							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
 						}),
-					_1: _user$project$Main$noteToJS('')
+					_1: _user$project$Main$stopNote('')
 				};
 			case 'MouseUp':
 				var updateAnimate = function (innernote) {
@@ -10486,7 +10491,7 @@ var _user$project$Main$update = F2(
 							mousedown: false,
 							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
 						}),
-					_1: _user$project$Main$noteToJS('')
+					_1: _user$project$Main$stopNote('')
 				};
 			case 'StartTouch':
 				var _p6 = _p2._0;
@@ -10523,7 +10528,7 @@ var _user$project$Main$update = F2(
 							touchEngaged: false,
 							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
 						}),
-					_1: _user$project$Main$noteToJS('')
+					_1: _user$project$Main$stopNote('')
 				};
 			case 'CancelTouch':
 				var updateAnimate = function (innernote) {
