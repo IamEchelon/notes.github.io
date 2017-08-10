@@ -9692,6 +9692,321 @@ var _mpizenberg$elm_touch_events$MultiTouch$onStart = function (tag) {
 	return A2(_mpizenberg$elm_touch_events$MultiTouch$on, 'touchstart', tag);
 };
 
+var _user$project$Cmds$initMobile = _elm_lang$core$Native_Platform.outgoingPort(
+	'initMobile',
+	function (v) {
+		return v;
+	});
+var _user$project$Cmds$noteToJS = _elm_lang$core$Native_Platform.outgoingPort(
+	'noteToJS',
+	function (v) {
+		return v;
+	});
+var _user$project$Cmds$stopNote = _elm_lang$core$Native_Platform.outgoingPort(
+	'stopNote',
+	function (v) {
+		return v;
+	});
+var _user$project$Cmds$synthToJS = _elm_lang$core$Native_Platform.outgoingPort(
+	'synthToJS',
+	function (v) {
+		return v;
+	});
+
+var _user$project$Note$Note = F7(
+	function (a, b, c, d, e, f, g) {
+		return {color: a, shape: b, value: c, tone_val: d, svgPath: e, hex_val: f, animate: g};
+	});
+var _user$project$Note$noteDecoder = A8(
+	_elm_lang$core$Json_Decode$map7,
+	_user$project$Note$Note,
+	A2(_elm_lang$core$Json_Decode$field, 'color', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'tone_val', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'path', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'hex_value', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$succeed(false));
+
+var _user$project$Model$synthesizers = {
+	ctor: '::',
+	_0: 'duosynth',
+	_1: {
+		ctor: '::',
+		_0: 'fmsynth',
+		_1: {
+			ctor: '::',
+			_0: 'amsynth',
+			_1: {
+				ctor: '::',
+				_0: 'membsynth',
+				_1: {
+					ctor: '::',
+					_0: 'monosynth',
+					_1: {
+						ctor: '::',
+						_0: 'square',
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}
+	}
+};
+var _user$project$Model$initialModel = {
+	notes: {ctor: '[]'},
+	alertMessage: _elm_lang$core$Maybe$Nothing,
+	signal: '',
+	instrument: A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_user$project$Model$synthesizers)),
+	debuglog: '',
+	mousedown: false,
+	touchEngaged: false,
+	modal: true,
+	animate: false
+};
+var _user$project$Model$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {notes: a, alertMessage: b, signal: c, instrument: d, debuglog: e, mousedown: f, touchEngaged: g, modal: h, animate: i};
+	});
+
+var _user$project$Update$httpErrorToMessage = function (error) {
+	var _p0 = error;
+	switch (_p0.ctor) {
+		case 'NetworkError':
+			return 'Is the Server Running?';
+		case 'BadStatus':
+			return _elm_lang$core$Basics$toString(_p0._0.status);
+		case 'BadPayload':
+			return A2(_elm_lang$core$Basics_ops['++'], 'Decoding failed, ', _p0._0);
+		default:
+			return _elm_lang$core$Basics$toString(error);
+	}
+};
+var _user$project$Update$Clear = {ctor: 'Clear'};
+var _user$project$Update$CancelTouch = function (a) {
+	return {ctor: 'CancelTouch', _0: a};
+};
+var _user$project$Update$EndTouch = function (a) {
+	return {ctor: 'EndTouch', _0: a};
+};
+var _user$project$Update$StartTouch = function (a) {
+	return {ctor: 'StartTouch', _0: a};
+};
+var _user$project$Update$MouseUp = {ctor: 'MouseUp'};
+var _user$project$Update$MouseLeave = {ctor: 'MouseLeave'};
+var _user$project$Update$MouseEnter = function (a) {
+	return {ctor: 'MouseEnter', _0: a};
+};
+var _user$project$Update$MouseDown = function (a) {
+	return {ctor: 'MouseDown', _0: a};
+};
+var _user$project$Update$ChooseSound = function (a) {
+	return {ctor: 'ChooseSound', _0: a};
+};
+var _user$project$Update$GetNotes = function (a) {
+	return {ctor: 'GetNotes', _0: a};
+};
+var _user$project$Update$getNotes = function () {
+	var notesUrl = 'https://api.myjson.com/bins/u0bbj';
+	return A2(
+		_elm_lang$http$Http$send,
+		_user$project$Update$GetNotes,
+		A2(
+			_elm_lang$http$Http$get,
+			notesUrl,
+			_elm_lang$core$Json_Decode$list(_user$project$Note$noteDecoder)));
+}();
+var _user$project$Update$NoOp = {ctor: 'NoOp'};
+var _user$project$Update$update = F2(
+	function (msg, model) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
+			case 'NoOp':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'});
+			case 'GetNotes':
+				if (_p1._0.ctor === 'Ok') {
+					var offset = A2(_elm_lang$dom$Dom_Scroll$toY, 'notes', 400);
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{notes: _p1._0._0}),
+						_1: A2(
+							_elm_lang$core$Task$attempt,
+							_elm_lang$core$Basics$always(_user$project$Update$NoOp),
+							offset)
+					};
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								alertMessage: _elm_lang$core$Maybe$Just(
+									_user$project$Update$httpErrorToMessage(_p1._0._0))
+							}),
+						{ctor: '[]'});
+				}
+			case 'ChooseSound':
+				var _p2 = _p1._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{instrument: _p2}),
+					_1: _user$project$Cmds$synthToJS(_p2)
+				};
+			case 'MouseDown':
+				var _p3 = _p1._0;
+				var updateAnimate = function (innernote) {
+					return _elm_lang$core$Native_Utils.eq(innernote.tone_val, _p3.tone_val) ? _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: true}) : _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: false});
+				};
+				return _elm_lang$core$Native_Utils.eq(model.touchEngaged, true) ? A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'}) : {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							signal: _p3.tone_val,
+							mousedown: true,
+							animate: true,
+							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
+						}),
+					_1: _user$project$Cmds$noteToJS(_p3.tone_val)
+				};
+			case 'MouseEnter':
+				var _p4 = _p1._0;
+				var updateAnimate = function (innernote) {
+					return _elm_lang$core$Native_Utils.eq(innernote.tone_val, _p4.tone_val) ? _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: true}) : _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: false});
+				};
+				return _elm_lang$core$Native_Utils.eq(model.touchEngaged, true) ? A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'}) : (_elm_lang$core$Native_Utils.eq(model.mousedown, true) ? {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							signal: _p4.tone_val,
+							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
+						}),
+					_1: _user$project$Cmds$noteToJS(_p4.tone_val)
+				} : A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'}));
+			case 'MouseLeave':
+				var updateAnimate = function (innernote) {
+					return _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: false});
+				};
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							signal: '',
+							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
+						}),
+					_1: _user$project$Cmds$stopNote('')
+				};
+			case 'MouseUp':
+				var updateAnimate = function (innernote) {
+					return _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: false});
+				};
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							signal: '',
+							mousedown: false,
+							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
+						}),
+					_1: _user$project$Cmds$stopNote('')
+				};
+			case 'StartTouch':
+				var _p5 = _p1._0;
+				var updateAnimate = function (innernote) {
+					return _elm_lang$core$Native_Utils.eq(innernote.tone_val, _p5.tone_val) ? _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: true}) : _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: false});
+				};
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							debuglog: A2(_elm_lang$core$Basics_ops['++'], 'I registered: ', _p5.tone_val),
+							touchEngaged: true,
+							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
+						}),
+					_1: _user$project$Cmds$noteToJS(_p5.tone_val)
+				};
+			case 'EndTouch':
+				var updateAnimate = function (innernote) {
+					return _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: false});
+				};
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							debuglog: A2(_elm_lang$core$Basics_ops['++'], 'Note last touched: ', _p1._0.tone_val),
+							touchEngaged: false,
+							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
+						}),
+					_1: _user$project$Cmds$stopNote('')
+				};
+			case 'CancelTouch':
+				var updateAnimate = function (innernote) {
+					return _elm_lang$core$Native_Utils.update(
+						innernote,
+						{animate: false});
+				};
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
+						}),
+					_1: _user$project$Cmds$noteToJS('')
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{modal: false}),
+					_1: _user$project$Cmds$initMobile('')
+				};
+		}
+	});
+
 var _user$project$Shapes$makeSvg = F2(
 	function (shapePath, color) {
 		return A2(
@@ -9768,22 +10083,7 @@ var _user$project$Shapes$makeSvg = F2(
 			});
 	});
 
-var _user$project$Note$Note = F7(
-	function (a, b, c, d, e, f, g) {
-		return {color: a, shape: b, value: c, tone_val: d, svgPath: e, hex_val: f, animate: g};
-	});
-var _user$project$Note$noteDecoder = A8(
-	_elm_lang$core$Json_Decode$map7,
-	_user$project$Note$Note,
-	A2(_elm_lang$core$Json_Decode$field, 'color', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'shape', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'tone_val', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'path', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'hex_value', _elm_lang$core$Json_Decode$string),
-	_elm_lang$core$Json_Decode$succeed(false));
-
-var _user$project$Main$apiAlertMessage = function (alertMessage) {
+var _user$project$View$apiAlertMessage = function (alertMessage) {
 	var _p0 = alertMessage;
 	if (_p0.ctor === 'Just') {
 		return A2(
@@ -9798,7 +10098,7 @@ var _user$project$Main$apiAlertMessage = function (alertMessage) {
 		return _elm_lang$html$Html$text('');
 	}
 };
-var _user$project$Main$logo = A2(
+var _user$project$View$logo = A2(
 	_elm_lang$html$Html$div,
 	{
 		ctor: '::',
@@ -9821,7 +10121,7 @@ var _user$project$Main$logo = A2(
 			{ctor: '[]'}),
 		_1: {ctor: '[]'}
 	});
-var _user$project$Main$transpControls = A2(
+var _user$project$View$transpControls = A2(
 	_elm_lang$html$Html$div,
 	{
 		ctor: '::',
@@ -9862,7 +10162,7 @@ var _user$project$Main$transpControls = A2(
 			}
 		}
 	});
-var _user$project$Main$synthControls = A2(
+var _user$project$View$synthControls = A2(
 	_elm_lang$html$Html$div,
 	{
 		ctor: '::',
@@ -9903,84 +10203,256 @@ var _user$project$Main$synthControls = A2(
 			}
 		}
 	});
-var _user$project$Main$httpErrorToMessage = function (error) {
-	var _p1 = error;
-	switch (_p1.ctor) {
-		case 'NetworkError':
-			return 'Is the Server Running?';
-		case 'BadStatus':
-			return _elm_lang$core$Basics$toString(_p1._0.status);
-		case 'BadPayload':
-			return A2(_elm_lang$core$Basics_ops['++'], 'Decoding failed, ', _p1._0);
-		default:
-			return _elm_lang$core$Basics$toString(error);
-	}
-};
-var _user$project$Main$synthesizers = {
-	ctor: '::',
-	_0: 'duosynth',
-	_1: {
-		ctor: '::',
-		_0: 'fmsynth',
-		_1: {
+var _user$project$View$selectSynth = function (model) {
+	var synthOption = function (synth) {
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$value(synth),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(synth),
+				_1: {ctor: '[]'}
+			});
+	};
+	var synthOptions = A2(_elm_lang$core$List$map, synthOption, _user$project$Model$synthesizers);
+	return A2(
+		_elm_lang$html$Html$div,
+		{
 			ctor: '::',
-			_0: 'amsynth',
+			_0: _elm_lang$html$Html_Attributes$classList(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'selectSynth', _1: true},
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$label,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('label has-text-centered'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Instruments'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
-				_0: 'membsynth',
+				_0: A2(
+					_elm_lang$html$Html$select,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onInput(_user$project$Update$ChooseSound),
+						_1: {ctor: '[]'}
+					},
+					synthOptions),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$View$instPanel = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('instpanel'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _user$project$View$selectSynth(model),
+			_1: {
+				ctor: '::',
+				_0: _user$project$View$synthControls,
 				_1: {
 					ctor: '::',
-					_0: 'monosynth',
+					_0: _user$project$View$transpControls,
 					_1: {
 						ctor: '::',
-						_0: 'square',
+						_0: _user$project$View$logo,
 						_1: {ctor: '[]'}
 					}
 				}
 			}
-		}
-	}
+		});
 };
-var _user$project$Main$initialModel = {
-	notes: {ctor: '[]'},
-	alertMessage: _elm_lang$core$Maybe$Nothing,
-	signal: '',
-	instrument: A2(
-		_elm_lang$core$Maybe$withDefault,
-		'',
-		_elm_lang$core$List$head(_user$project$Main$synthesizers)),
-	debuglog: '',
-	mousedown: false,
-	touchEngaged: false,
-	modal: true,
-	animate: false
+var _user$project$View$htmlNote = F2(
+	function (model, note) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'htmlNote', _1: true},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'keydown', _1: note.animate},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$id(
+						_elm_lang$core$Basics$toString(note.value)),
+					_1: {
+						ctor: '::',
+						_0: _mpizenberg$elm_touch_events$MultiTouch$onStart(
+							_elm_lang$core$Basics$always(
+								_user$project$Update$StartTouch(note))),
+						_1: {
+							ctor: '::',
+							_0: _mpizenberg$elm_touch_events$MultiTouch$onEnd(
+								_elm_lang$core$Basics$always(
+									_user$project$Update$EndTouch(note))),
+							_1: {
+								ctor: '::',
+								_0: _mpizenberg$elm_touch_events$MultiTouch$onCancel(
+									_elm_lang$core$Basics$always(
+										_user$project$Update$CancelTouch(note))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onMouseDown(
+										_user$project$Update$MouseDown(note)),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onMouseEnter(
+											_user$project$Update$MouseEnter(note)),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onMouseLeave(_user$project$Update$MouseLeave),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onMouseUp(_user$project$Update$MouseUp),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(_user$project$Shapes$makeSvg, note.svgPath, note.hex_val),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$View$htmlKeys = function (model) {
+	var htmlNotes = A2(
+		_elm_lang$core$List$map,
+		_user$project$View$htmlNote(model),
+		model.notes);
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('htmlKeys'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$id('notes'),
+				_1: {ctor: '[]'}
+			}
+		},
+		htmlNotes);
 };
-var _user$project$Main$initMobile = _elm_lang$core$Native_Platform.outgoingPort(
-	'initMobile',
-	function (v) {
-		return v;
-	});
-var _user$project$Main$noteToJS = _elm_lang$core$Native_Platform.outgoingPort(
-	'noteToJS',
-	function (v) {
-		return v;
-	});
-var _user$project$Main$stopNote = _elm_lang$core$Native_Platform.outgoingPort(
-	'stopNote',
-	function (v) {
-		return v;
-	});
-var _user$project$Main$synthToJS = _elm_lang$core$Native_Platform.outgoingPort(
-	'synthToJS',
-	function (v) {
-		return v;
-	});
-var _user$project$Main$Model = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {notes: a, alertMessage: b, signal: c, instrument: d, debuglog: e, mousedown: f, touchEngaged: g, modal: h, animate: i};
-	});
-var _user$project$Main$Clear = {ctor: 'Clear'};
-var _user$project$Main$modalButton = function (model) {
+var _user$project$View$keyboard = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('keyboard'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$id('octave-1'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _user$project$View$htmlKeys(model),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$id('octave-2'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _user$project$View$htmlKeys(model),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$id('octave-3'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _user$project$View$htmlKeys(model),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _user$project$View$instrument = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('instrument'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _user$project$View$keyboard(model),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('panel'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _user$project$View$instPanel(model),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$View$modalButton = function (model) {
 	return A2(
 		_elm_lang$html$Html$button,
 		{
@@ -9996,7 +10468,7 @@ var _user$project$Main$modalButton = function (model) {
 				_0: _elm_lang$html$Html_Attributes$id('playButton'),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Clear),
+					_0: _elm_lang$html$Html_Events$onClick(_user$project$Update$Clear),
 					_1: {ctor: '[]'}
 				}
 			}
@@ -10007,7 +10479,7 @@ var _user$project$Main$modalButton = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$Main$mobileModal = function (model) {
+var _user$project$View$mobileModal = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -10049,283 +10521,14 @@ var _user$project$Main$mobileModal = function (model) {
 					},
 					{
 						ctor: '::',
-						_0: _user$project$Main$modalButton(model),
+						_0: _user$project$View$modalButton(model),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _user$project$Main$CancelTouch = function (a) {
-	return {ctor: 'CancelTouch', _0: a};
-};
-var _user$project$Main$EndTouch = function (a) {
-	return {ctor: 'EndTouch', _0: a};
-};
-var _user$project$Main$StartTouch = function (a) {
-	return {ctor: 'StartTouch', _0: a};
-};
-var _user$project$Main$MouseUp = {ctor: 'MouseUp'};
-var _user$project$Main$MouseLeave = {ctor: 'MouseLeave'};
-var _user$project$Main$MouseEnter = function (a) {
-	return {ctor: 'MouseEnter', _0: a};
-};
-var _user$project$Main$MouseDown = function (a) {
-	return {ctor: 'MouseDown', _0: a};
-};
-var _user$project$Main$htmlNote = F2(
-	function (model, note) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$classList(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'htmlNote', _1: true},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'keydown', _1: note.animate},
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$id(
-						_elm_lang$core$Basics$toString(note.value)),
-					_1: {
-						ctor: '::',
-						_0: _mpizenberg$elm_touch_events$MultiTouch$onStart(
-							_elm_lang$core$Basics$always(
-								_user$project$Main$StartTouch(note))),
-						_1: {
-							ctor: '::',
-							_0: _mpizenberg$elm_touch_events$MultiTouch$onEnd(
-								_elm_lang$core$Basics$always(
-									_user$project$Main$EndTouch(note))),
-							_1: {
-								ctor: '::',
-								_0: _mpizenberg$elm_touch_events$MultiTouch$onCancel(
-									_elm_lang$core$Basics$always(
-										_user$project$Main$CancelTouch(note))),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onMouseDown(
-										_user$project$Main$MouseDown(note)),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onMouseEnter(
-											_user$project$Main$MouseEnter(note)),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onMouseLeave(_user$project$Main$MouseLeave),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onMouseUp(_user$project$Main$MouseUp),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			{
-				ctor: '::',
-				_0: A2(_user$project$Shapes$makeSvg, note.svgPath, note.hex_val),
-				_1: {ctor: '[]'}
-			});
-	});
-var _user$project$Main$htmlKeys = function (model) {
-	var htmlNotes = A2(
-		_elm_lang$core$List$map,
-		_user$project$Main$htmlNote(model),
-		model.notes);
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('htmlKeys'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$id('notes'),
-				_1: {ctor: '[]'}
-			}
-		},
-		htmlNotes);
-};
-var _user$project$Main$keyboard = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('keyboard'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$id('octave-1'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _user$project$Main$htmlKeys(model),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$id('octave-2'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _user$project$Main$htmlKeys(model),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$id('octave-3'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _user$project$Main$htmlKeys(model),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
-			}
-		});
-};
-var _user$project$Main$ChooseSound = function (a) {
-	return {ctor: 'ChooseSound', _0: a};
-};
-var _user$project$Main$selectSynth = function (model) {
-	var synthOption = function (synth) {
-		return A2(
-			_elm_lang$html$Html$option,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$value(synth),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(synth),
-				_1: {ctor: '[]'}
-			});
-	};
-	var synthOptions = A2(_elm_lang$core$List$map, synthOption, _user$project$Main$synthesizers);
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$classList(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'selectSynth', _1: true},
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$label,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('label has-text-centered'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Instruments'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$select,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$ChooseSound),
-						_1: {ctor: '[]'}
-					},
-					synthOptions),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$Main$instPanel = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('instpanel'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: _user$project$Main$selectSynth(model),
-			_1: {
-				ctor: '::',
-				_0: _user$project$Main$synthControls,
-				_1: {
-					ctor: '::',
-					_0: _user$project$Main$transpControls,
-					_1: {
-						ctor: '::',
-						_0: _user$project$Main$logo,
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		});
-};
-var _user$project$Main$instrument = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('instrument'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: _user$project$Main$keyboard(model),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('panel'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _user$project$Main$instPanel(model),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$Main$view = function (model) {
+var _user$project$View$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -10333,229 +10536,30 @@ var _user$project$Main$view = function (model) {
 			_0: _elm_lang$html$Html_Attributes$class('notesBody'),
 			_1: {
 				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onMouseUp(_user$project$Main$MouseUp),
+				_0: _elm_lang$html$Html_Events$onMouseUp(_user$project$Update$MouseUp),
 				_1: {ctor: '[]'}
 			}
 		},
 		{
 			ctor: '::',
-			_0: _user$project$Main$mobileModal(model),
+			_0: _user$project$View$mobileModal(model),
 			_1: {
 				ctor: '::',
-				_0: _user$project$Main$instrument(model),
+				_0: _user$project$View$instrument(model),
 				_1: {
 					ctor: '::',
-					_0: _user$project$Main$apiAlertMessage(model.alertMessage),
+					_0: _user$project$View$apiAlertMessage(model.alertMessage),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
-var _user$project$Main$GetNotes = function (a) {
-	return {ctor: 'GetNotes', _0: a};
-};
-var _user$project$Main$getNotes = function () {
-	var notesUrl = 'https://api.myjson.com/bins/u0bbj';
-	return A2(
-		_elm_lang$http$Http$send,
-		_user$project$Main$GetNotes,
-		A2(
-			_elm_lang$http$Http$get,
-			notesUrl,
-			_elm_lang$core$Json_Decode$list(_user$project$Note$noteDecoder)));
-}();
-var _user$project$Main$NoOp = {ctor: 'NoOp'};
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
-			case 'NoOp':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{ctor: '[]'});
-			case 'GetNotes':
-				if (_p2._0.ctor === 'Ok') {
-					var offset = A2(_elm_lang$dom$Dom_Scroll$toY, 'notes', 400);
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{notes: _p2._0._0}),
-						_1: A2(
-							_elm_lang$core$Task$attempt,
-							_elm_lang$core$Basics$always(_user$project$Main$NoOp),
-							offset)
-					};
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								alertMessage: _elm_lang$core$Maybe$Just(
-									_user$project$Main$httpErrorToMessage(_p2._0._0))
-							}),
-						{ctor: '[]'});
-				}
-			case 'ChooseSound':
-				var _p3 = _p2._0;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{instrument: _p3}),
-					_1: _user$project$Main$synthToJS(_p3)
-				};
-			case 'MouseDown':
-				var _p4 = _p2._0;
-				var updateAnimate = function (innernote) {
-					return _elm_lang$core$Native_Utils.eq(innernote.tone_val, _p4.tone_val) ? _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: true}) : _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: false});
-				};
-				return _elm_lang$core$Native_Utils.eq(model.touchEngaged, true) ? A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{ctor: '[]'}) : {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							signal: _p4.tone_val,
-							mousedown: true,
-							animate: true,
-							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
-						}),
-					_1: _user$project$Main$noteToJS(_p4.tone_val)
-				};
-			case 'MouseEnter':
-				var _p5 = _p2._0;
-				var updateAnimate = function (innernote) {
-					return _elm_lang$core$Native_Utils.eq(innernote.tone_val, _p5.tone_val) ? _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: true}) : _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: false});
-				};
-				return _elm_lang$core$Native_Utils.eq(model.touchEngaged, true) ? A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{ctor: '[]'}) : (_elm_lang$core$Native_Utils.eq(model.mousedown, true) ? {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							signal: _p5.tone_val,
-							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
-						}),
-					_1: _user$project$Main$noteToJS(_p5.tone_val)
-				} : A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{ctor: '[]'}));
-			case 'MouseLeave':
-				var updateAnimate = function (innernote) {
-					return _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: false});
-				};
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							signal: '',
-							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
-						}),
-					_1: _user$project$Main$stopNote('')
-				};
-			case 'MouseUp':
-				var updateAnimate = function (innernote) {
-					return _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: false});
-				};
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							signal: '',
-							mousedown: false,
-							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
-						}),
-					_1: _user$project$Main$stopNote('')
-				};
-			case 'StartTouch':
-				var _p6 = _p2._0;
-				var updateAnimate = function (innernote) {
-					return _elm_lang$core$Native_Utils.eq(innernote.tone_val, _p6.tone_val) ? _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: true}) : _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: false});
-				};
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							debuglog: A2(_elm_lang$core$Basics_ops['++'], 'I registered: ', _p6.tone_val),
-							touchEngaged: true,
-							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
-						}),
-					_1: _user$project$Main$noteToJS(_p6.tone_val)
-				};
-			case 'EndTouch':
-				var updateAnimate = function (innernote) {
-					return _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: false});
-				};
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							debuglog: A2(_elm_lang$core$Basics_ops['++'], 'Note last touched: ', _p2._0.tone_val),
-							touchEngaged: false,
-							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
-						}),
-					_1: _user$project$Main$stopNote('')
-				};
-			case 'CancelTouch':
-				var updateAnimate = function (innernote) {
-					return _elm_lang$core$Native_Utils.update(
-						innernote,
-						{animate: false});
-				};
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							notes: A2(_elm_lang$core$List$map, updateAnimate, model.notes)
-						}),
-					_1: _user$project$Main$noteToJS('')
-				};
-			default:
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{modal: false}),
-					_1: _user$project$Main$initMobile('')
-				};
-		}
-	});
+
 var _user$project$Main$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$Main$initialModel, _1: _user$project$Main$getNotes},
-		view: _user$project$Main$view,
-		update: _user$project$Main$update,
+		init: {ctor: '_Tuple2', _0: _user$project$Model$initialModel, _1: _user$project$Update$getNotes},
+		view: _user$project$View$view,
+		update: _user$project$Update$update,
 		subscriptions: _elm_lang$core$Basics$always(_elm_lang$core$Platform_Sub$none)
 	})();
 

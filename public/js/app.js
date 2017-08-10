@@ -147,7 +147,15 @@ var __makeRelativeRequire = function(require, mappings, pref) {
     return require(name);
   }
 };
-require.register("elm/Main.elm", function(exports, require, module) {
+require.register("elm/Cmds.elm", function(exports, require, module) {
+
+});
+
+;require.register("elm/Main.elm", function(exports, require, module) {
+
+});
+
+;require.register("elm/Model.elm", function(exports, require, module) {
 
 });
 
@@ -156,6 +164,14 @@ require.register("elm/Main.elm", function(exports, require, module) {
 });
 
 ;require.register("elm/Shapes.elm", function(exports, require, module) {
+
+});
+
+;require.register("elm/Update.elm", function(exports, require, module) {
+
+});
+
+;require.register("elm/View.elm", function(exports, require, module) {
 
 });
 

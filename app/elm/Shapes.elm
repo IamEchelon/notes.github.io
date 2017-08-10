@@ -1,7 +1,7 @@
 module Shapes exposing (..)
 
-import Html exposing (Html)
 import Svg exposing (..)
+import Html exposing (Html)
 import Svg.Attributes exposing (..)
 
 

@@ -1,9 +1,39 @@
-module Update exposing (..)
+module Update exposing (Msg(..), update, getNotes)
 
-import Note exposing (..)
-import Model
+import Http
 import Task
-import Ports
+import Dom.Scroll
+import Cmds exposing (..)
+import Note exposing (Note, noteDecoder)
+import Json.Decode as ReadJson exposing (..)
+import Model exposing (Model, initialModel, synthesizers)
+
+
+httpErrorToMessage : Http.Error -> String
+httpErrorToMessage error =
+    case error of
+        Http.NetworkError ->
+            "Is the Server Running?"
+
+        Http.BadStatus response ->
+            toString response.status
+
+        Http.BadPayload message _ ->
+            "Decoding failed, " ++ message
+
+        _ ->
+            toString error
+
+
+getNotes : Cmd Msg
+getNotes =
+    let
+        notesUrl =
+            "https://api.myjson.com/bins/u0bbj"
+    in
+        (ReadJson.list noteDecoder)
+            |> Http.get notesUrl
+            |> Http.send GetNotes
 
 
 type Msg
