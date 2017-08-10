@@ -194,39 +194,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var node = document.getElementById('note-box');
   var elmApp = Elm.Main.embed(node);
   var context = new AudioContext();
-  var synth = void 0;
   var android = _browser.browser.android();
   var iphone = _browser.browser.iphone();
   var ipad = _browser.browser.ipad();
-
-  // Selects & creates a new instance of tone synthesizer
-  var chooseSynth = function chooseSynth(elmSynth) {
-    switch (elmSynth) {
-      case 'duosynth':
-        return _synths.select.duosynth();
-      case 'fmsynth':
-        return _synths.select.fmsynth();
-      case 'amsynth':
-        return _synths.select.amsynth();
-      case 'membsynth':
-        return _synths.select.membsynth();
-      case 'monosynth':
-        return _synths.select.monosynth();
-      case 'square':
-        return _synths.select.square('square');
-      case 'Please Select a Sound-':
-        return 'None';
-      default:
-        console.log('Something has gone horribly awry!');
-    }
-  };
-
-  // Receive info from Elm
-  if (android || iphone || ipad) {
-    elmApp.ports.initMobile.subscribe(setMobileContext);
-  } else {
-    elmApp.ports.synthToJS.subscribe(synthSelection);
-  }
+  var synth = (0, _synths.chooseSynth)('duosynth');
 
   // elm callbacks
   var triggerNote = function triggerNote(elmNote) {
@@ -237,16 +208,22 @@ document.addEventListener('DOMContentLoaded', function () {
     return synth.triggerRelease();
   };
 
-  function synthSelection(elmSynth) {
-    synth = chooseSynth(elmSynth);
-    elmApp.ports.noteToJS.subscribe(triggerNote);
-    elmApp.ports.stopNote.subscribe(stopNote);
-  }
+  var synthSelection = function synthSelection(elmSynth) {
+    return synth = (0, _synths.chooseSynth)(elmSynth);
+  };
 
   var setMobileContext = function setMobileContext(noop) {
-    StartAudioContext(Tone.context, '#playButton');
-    elmApp.ports.synthToJS.subscribe(synthSelection);
+    return StartAudioContext(Tone.context, '#playButton');
   };
+
+  // elm subscriptions
+  if (android || iphone || ipad) {
+    elmApp.ports.initMobile.subscribe(setMobileContext);
+  }
+
+  elmApp.ports.synthToJS.subscribe(synthSelection);
+  elmApp.ports.noteToJS.subscribe(triggerNote);
+  elmApp.ports.stopNote.subscribe(stopNote);
 
   console.log('Initialized app');
 });
@@ -259,7 +236,7 @@ require.register("js/synths.js", function(exports, require, module) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.select = undefined;
+exports.chooseSynth = undefined;
 
 var _tone = require('tone');
 
@@ -267,7 +244,7 @@ var _tone2 = _interopRequireDefault(_tone);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var select = exports.select = {
+var select = {
   limiter: new _tone2.default.Limiter(-14),
 
   // create instruments
@@ -307,10 +284,30 @@ var select = exports.select = {
     return sq;
   }
 }; // This is where we construct our variouse ToneJS instruments
+var chooseSynth = exports.chooseSynth = function chooseSynth(elmSynth) {
+  switch (elmSynth) {
+    case 'duosynth':
+      return select.duosynth();
+    case 'fmsynth':
+      return select.fmsynth();
+    case 'amsynth':
+      return select.amsynth();
+    case 'membsynth':
+      return select.membsynth();
+    case 'monosynth':
+      return select.monosynth();
+    case 'square':
+      return select.square('square');
+    case 'Please Select a Sound-':
+      return 'None';
+    default:
+      console.log('Something has gone horribly awry!');
+  }
+};
 
 });
 
-;require.alias("buffer/index.js", "buffer");require.register("___globals___", function(exports, require, module) {
+require.alias("buffer/index.js", "buffer");require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 

@@ -1,7 +1,7 @@
 // This is where we construct our variouse ToneJS instruments
 import Tone from 'tone'
 
-export const select = {
+const select = {
   limiter: new Tone.Limiter(-14),
 
   // create instruments
@@ -46,5 +46,26 @@ export const select = {
       .connect(this.limiter)
       .toMaster()
     return sq
+  }
+}
+
+export const chooseSynth = elmSynth => {
+  switch (elmSynth) {
+    case 'duosynth':
+      return select.duosynth()
+    case 'fmsynth':
+      return select.fmsynth()
+    case 'amsynth':
+      return select.amsynth()
+    case 'membsynth':
+      return select.membsynth()
+    case 'monosynth':
+      return select.monosynth()
+    case 'square':
+      return select.square('square')
+    case 'Please Select a Sound-':
+      return 'None'
+    default:
+      console.log('Something has gone horribly awry!')
   }
 }

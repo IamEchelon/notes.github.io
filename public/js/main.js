@@ -9918,27 +9918,23 @@ var _user$project$Main$httpErrorToMessage = function (error) {
 };
 var _user$project$Main$synthesizers = {
 	ctor: '::',
-	_0: 'Select a Sound',
+	_0: 'duosynth',
 	_1: {
 		ctor: '::',
-		_0: 'duosynth',
+		_0: 'fmsynth',
 		_1: {
 			ctor: '::',
-			_0: 'fmsynth',
+			_0: 'amsynth',
 			_1: {
 				ctor: '::',
-				_0: 'amsynth',
+				_0: 'membsynth',
 				_1: {
 					ctor: '::',
-					_0: 'membsynth',
+					_0: 'monosynth',
 					_1: {
 						ctor: '::',
-						_0: 'monosynth',
-						_1: {
-							ctor: '::',
-							_0: 'square',
-							_1: {ctor: '[]'}
-						}
+						_0: 'square',
+						_1: {ctor: '[]'}
 					}
 				}
 			}

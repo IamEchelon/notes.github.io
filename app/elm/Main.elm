@@ -60,8 +60,7 @@ initialModel =
 -}
 synthesizers : List String
 synthesizers =
-    [ "Select a Sound"
-    , "duosynth"
+    [ "duosynth"
     , "fmsynth"
     , "amsynth"
     , "membsynth"
