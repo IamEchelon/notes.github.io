@@ -1,0 +1,114 @@
+@import _functions
+@import "~bulma"
+
+// Constants
+$panelColor: #D8D8D8
+$width: 150px
+$xspacing: 5px
+$spacer: $width / 2 + $xspacing
+
+// geometry for hexagon height
+$cap_geometry: tan(30deg)
+
+// height for top of hexagon
+$margin_height: $width / 2 * $cap_geometry / 2
+
+// Spacing between hexagons on x axis
+$half-x-spacing: $xspacing / 2
+
+
+// Shape Key Panel Styles
+.htmlKeys
+	width: 1100px
+	display: flex
+	flex-direction: row
+	flex-wrap: wrap-reverse	
+	padding-bottom: 150px
+	margin: 40px auto 0
+
+
+#octave-2
+	margin-left: -170px
+	margin-top: 270px
+	
+#octave-3
+	margin-left: -170px
+	margin-top: 270 * 2px
+
+.htmlKeys .htmlNote:nth-child(12n + 7)
+	margin-left: $spacer
+// .htmlKeys .htmlNote:nth-child(12n + 1)
+//     margin-right: 0px
+
+.htmlNote
+	cursor: pointer
+	width: $width
+	margin: -$margin_height $half-x-spacing
+	transition: all 100ms ease-in
+	transform: scale(1)
+	animation: bounce 1s infinite alternate
+	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)
+
+
+.keydown
+	transition: all 100ms ease-in
+	transform: scale(0.8)
+
+.keyboard
+	display: flex
+	flex-direction: row
+	overflow-x: scroll
+
+
+// Transpot Panel Styles
+.panel
+	background: $panelColor
+	height: 10%
+	position: fixed
+	bottom: 0
+	right: 0
+	left: 0
+
+
+.selectSynth
+	.label 
+		user-select: none
+	
+	select
+		user-select: none
+		text-align: center
+		padding: 5px 8px
+		padding-left: 15px
+		width: 200px
+		border-radius: 0
+		border: none
+		box-shadow: none
+		background: white
+		background-image: none
+		-webkit-appearance: none
+		border-left: 5px solid grey
+
+	select:focus
+		outline: none
+
+
+#playButton
+	background-color: transparent
+	color: white
+	display: inline
+	font-size: 1em
+	padding: 15px 20px
+	border: 1px solid white
+	letter-spacing: 1px
+
+
+.instpanel
+	display: flex
+	height: 100%
+	width: 100%
+	flex-direction: row
+	justify-content: space-around
+	align-items: center
+	align-content: center
+
+       
