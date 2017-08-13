@@ -1,8 +1,6 @@
 module Update exposing (Msg(..), update, getNotes)
 
 import Http
-import Task
-import Dom.Scroll
 import Cmds exposing (..)
 import Note exposing (Note, noteDecoder)
 import Json.Decode as ReadJson exposing (..)
@@ -36,6 +34,27 @@ getNotes =
             |> Http.send GetNotes
 
 
+
+-- Helper functions
+
+
+updateAnimate : Note -> Note -> Note
+updateAnimate note innernote =
+    if innernote.tone_val == note.tone_val then
+        { innernote | animate = True }
+    else
+        { innernote | animate = False }
+
+
+stopAnimation : Note -> Note
+stopAnimation note =
+    { note | animate = False }
+
+
+
+-- Messages used to trigger updates
+
+
 type Msg
     = NoOp
     | GetNotes (Result Http.Error (List Note))
@@ -61,11 +80,7 @@ update msg model =
             model ! []
 
         GetNotes (Ok dbNotes) ->
-            let
-                offset =
-                    Dom.Scroll.toY "notes" 400
-            in
-                ( { model | notes = dbNotes }, Task.attempt (always NoOp) <| offset )
+            ({ model | notes = dbNotes } ! [])
 
         GetNotes (Err error) ->
             ({ model | alertMessage = Just (httpErrorToMessage error) } ! [])
@@ -76,11 +91,8 @@ update msg model =
         -- Mouse Events
         MouseDown note ->
             let
-                updateAnimate innernote =
-                    if innernote.tone_val == note.tone_val then
-                        { innernote | animate = True }
-                    else
-                        { innernote | animate = False }
+                curriedAnim =
+                    updateAnimate note
             in
                 if model.touchEngaged == True then
                     model ! []
@@ -89,25 +101,22 @@ update msg model =
                         | signal = note.tone_val
                         , mousedown = True
                         , animate = True
-                        , notes = List.map updateAnimate model.notes
+                        , notes = List.map curriedAnim model.notes
                       }
                     , noteToJS note.tone_val
                     )
 
         MouseEnter note ->
             let
-                updateAnimate innernote =
-                    if innernote.tone_val == note.tone_val then
-                        { innernote | animate = True }
-                    else
-                        { innernote | animate = False }
+                curriedAnim =
+                    updateAnimate note
             in
                 if model.touchEngaged == True then
                     model ! []
                 else if model.mousedown == True then
                     ( { model
                         | signal = note.tone_val
-                        , notes = List.map updateAnimate model.notes
+                        , notes = List.map curriedAnim model.notes
                       }
                     , noteToJS note.tone_val
                     )
@@ -115,66 +124,47 @@ update msg model =
                     model ! []
 
         MouseLeave ->
-            let
-                updateAnimate innernote =
-                    { innernote | animate = False }
-            in
-                ( { model
-                    | signal = ""
-                    , notes = List.map updateAnimate model.notes
-                  }
-                , stopNote ""
-                )
+            ( { model
+                | signal = ""
+                , notes = List.map stopAnimation model.notes
+              }
+            , stopNote ""
+            )
 
         MouseUp ->
-            let
-                updateAnimate innernote =
-                    { innernote | animate = False }
-            in
-                ( { model
-                    | signal = ""
-                    , mousedown = False
-                    , notes = List.map updateAnimate model.notes
-                  }
-                , stopNote ""
-                )
+            ( { model
+                | signal = ""
+                , mousedown = False
+                , notes = List.map stopAnimation model.notes
+              }
+            , stopNote ""
+            )
 
         -- Touch Events
         StartTouch note ->
             let
-                updateAnimate innernote =
-                    if innernote.tone_val == note.tone_val then
-                        { innernote | animate = True }
-                    else
-                        { innernote | animate = False }
+                curriedAnim =
+                    updateAnimate note
             in
                 ( { model
                     | debuglog = "I registered: " ++ note.tone_val
                     , touchEngaged = True
-                    , notes = List.map updateAnimate model.notes
+                    , notes = List.map curriedAnim model.notes
                   }
                 , noteToJS note.tone_val
                 )
 
         EndTouch note ->
-            let
-                updateAnimate innernote =
-                    { innernote | animate = False }
-            in
-                ( { model
-                    | debuglog = "Note last touched: " ++ note.tone_val
-                    , touchEngaged = False
-                    , notes = List.map updateAnimate model.notes
-                  }
-                , stopNote ""
-                )
+            ( { model
+                | debuglog = "Note last touched: " ++ note.tone_val
+                , touchEngaged = False
+                , notes = List.map stopAnimation model.notes
+              }
+            , stopNote ""
+            )
 
         CancelTouch note ->
-            let
-                updateAnimate innernote =
-                    { innernote | animate = False }
-            in
-                ( { model | notes = List.map updateAnimate model.notes }, noteToJS "" )
+            ( { model | notes = List.map stopAnimation model.notes }, noteToJS "" )
 
         Clear ->
             ( { model | modal = False }, initMobile "" )

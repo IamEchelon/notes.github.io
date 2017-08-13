@@ -57,12 +57,12 @@ instrument model =
         ]
 
 
+keyboard : Model -> Html Msg
 keyboard model =
     div [ class "keyboard" ]
         [ div [ id "octave-1" ] [ htmlKeys model ]
-
-        -- , div [ id "octave-2" ] [ htmlKeys model ]
-        -- , div [ id "octave-3" ] [ htmlKeys model ]
+        , div [ id "octave-2" ] [ htmlKeys model ]
+        , div [ id "octave-3" ] [ htmlKeys model ]
         ]
 
 

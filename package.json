@@ -28,7 +28,8 @@
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack --env.production -p",
-    "dest": "rm -r dist"
+    "dest": "rm -r dist",
+    "tree": "webpack --json > tree.json"
   },
   "devDependencies": {
     "html-webpack-plugin": "^2.30.1",

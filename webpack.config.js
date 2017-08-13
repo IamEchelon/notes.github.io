@@ -3,6 +3,7 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 // Set plugin constants
 const hmr = new webpack.HotModuleReplacementPlugin()
@@ -14,6 +15,7 @@ const loadHtml = new HtmlWebpackPlugin({
 const extractPlugin = new ExtractTextPlugin({
   filename: 'main.css'
 })
+const uglify = new UglifyJSPlugin()
 
 // Main
 module.exports = env => {
@@ -37,7 +39,7 @@ module.exports = env => {
         {
           // Elm loader
           test: /\.elm$/,
-          exclude: [/elm-stuff/, /node_modules/],
+          exclude: [/elm-stuff/, /node_modules/, /notesAPI/],
           use: [
             {
               loader: 'elm-hot-loader'
@@ -52,7 +54,7 @@ module.exports = env => {
           // Babel ES6 loader
           test: /\.js$/,
           loader: 'babel-loader',
-          exclude: [/elm-stuff/, /node_modules/]
+          exclude: [/elm-stuff/, /node_modules/, /notesAPI/]
         },
         {
           // Images and assets loader
@@ -72,7 +74,7 @@ module.exports = env => {
     },
 
     // Additional functionality
-    plugins: [loadHtml, hmr, extractPlugin],
+    plugins: [loadHtml, hmr, extractPlugin, uglify],
 
     // webserver object
     devServer: {
