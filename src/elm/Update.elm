@@ -38,16 +38,16 @@ getNotes =
 -- Helper functions
 
 
-updateAnimate : Note -> Note -> Note
-updateAnimate note innernote =
+animate : Note -> Note -> Note
+animate note innernote =
     if innernote.tone_val == note.tone_val then
         { innernote | animate = True }
     else
         { innernote | animate = False }
 
 
-stopAnimation : Note -> Note
-stopAnimation note =
+stopAnim : Note -> Note
+stopAnim note =
     { note | animate = False }
 
 
@@ -66,7 +66,7 @@ type Msg
     | StartTouch Note
     | EndTouch Note
     | CancelTouch Note
-    | Clear
+    | ClearModal
 
 
 
@@ -92,14 +92,13 @@ update msg model =
         MouseDown note ->
             let
                 curriedAnim =
-                    updateAnimate note
+                    animate note
             in
                 if model.touchEngaged == True then
                     model ! []
                 else
                     ( { model
-                        | signal = note.tone_val
-                        , mousedown = True
+                        | mousedown = True
                         , animate = True
                         , notes = List.map curriedAnim model.notes
                       }
@@ -109,33 +108,24 @@ update msg model =
         MouseEnter note ->
             let
                 curriedAnim =
-                    updateAnimate note
+                    animate note
             in
                 if model.touchEngaged == True then
                     model ! []
                 else if model.mousedown == True then
-                    ( { model
-                        | signal = note.tone_val
-                        , notes = List.map curriedAnim model.notes
-                      }
+                    ( { model | notes = List.map curriedAnim model.notes }
                     , noteToJS note.tone_val
                     )
                 else
                     model ! []
 
         MouseLeave ->
-            ( { model
-                | signal = ""
-                , notes = List.map stopAnimation model.notes
-              }
-            , stopNote ""
-            )
+            ( { model | notes = List.map stopAnim model.notes }, stopNote "" )
 
         MouseUp ->
             ( { model
-                | signal = ""
-                , mousedown = False
-                , notes = List.map stopAnimation model.notes
+                | mousedown = False
+                , notes = List.map stopAnim model.notes
               }
             , stopNote ""
             )
@@ -144,11 +134,10 @@ update msg model =
         StartTouch note ->
             let
                 curriedAnim =
-                    updateAnimate note
+                    animate note
             in
                 ( { model
-                    | debuglog = "I registered: " ++ note.tone_val
-                    , touchEngaged = True
+                    | touchEngaged = True
                     , notes = List.map curriedAnim model.notes
                   }
                 , noteToJS note.tone_val
@@ -156,15 +145,14 @@ update msg model =
 
         EndTouch note ->
             ( { model
-                | debuglog = "Note last touched: " ++ note.tone_val
-                , touchEngaged = False
-                , notes = List.map stopAnimation model.notes
+                | touchEngaged = False
+                , notes = List.map stopAnim model.notes
               }
             , stopNote ""
             )
 
         CancelTouch note ->
-            ( { model | notes = List.map stopAnimation model.notes }, noteToJS "" )
+            ( { model | notes = List.map stopAnim model.notes }, stopNote "" )
 
-        Clear ->
+        ClearModal ->
             ( { model | modal = False }, initMobile "" )

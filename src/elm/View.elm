@@ -40,7 +40,7 @@ modalButton model =
     button
         [ classList [ ( "is-active", model.modal ) ]
         , id "playButton"
-        , Events.onClick Clear
+        , Events.onClick ClearModal
         ]
         [ text "Start" ]
 
