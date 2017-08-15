@@ -82,13 +82,14 @@ htmlNote model note =
     div
         [ classList [ ( "htmlNote", True ), ( "keydown", note.animate ) ]
         , id (toString note.value)
-        , MultiTouch.onStart (always <| StartTouch note)
-        , MultiTouch.onEnd (always <| EndTouch note)
-        , MultiTouch.onCancel (always <| CancelTouch note)
-        , Events.onMouseDown <| MouseDown note
-        , Events.onMouseEnter <| MouseEnter note
-        , Events.onMouseLeave MouseLeave
-        , Events.onMouseUp MouseUp
+
+        -- , MultiTouch.onStart (always <| StartTouch note)
+        -- , MultiTouch.onEnd (always <| EndTouch note)
+        -- , MultiTouch.onCancel (always <| CancelTouch note)
+        -- , Events.onMouseDown <| MouseDown note
+        -- , Events.onMouseEnter <| MouseEnter note
+        -- , Events.onMouseLeave MouseLeave
+        -- , Events.onMouseUp MouseUp
         ]
         [ Shapes.makeSvg note.svgPath note.hex_val ]
 

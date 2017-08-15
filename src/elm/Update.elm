@@ -41,7 +41,7 @@ getNotes =
 animate : Note -> Note -> Note
 animate note innernote =
     if innernote.tone_val == note.tone_val then
-        { innernote | animate = True }
+        { innernote | animate = False }
     else
         { innernote | animate = False }
 
@@ -106,29 +106,31 @@ update msg model =
                     )
 
         MouseEnter note ->
-            let
-                curriedAnim =
-                    animate note
-            in
-                if model.touchEngaged == True then
-                    model ! []
-                else if model.mousedown == True then
-                    ( { model | notes = List.map curriedAnim model.notes }
-                    , noteToJS note.tone_val
-                    )
-                else
-                    model ! []
+            -- let
+            --     curriedAnim =
+            --         animate note
+            -- in
+            --     if model.touchEngaged == True then
+            --         model ! []
+            --     else if model.mousedown == True then
+            --         ( { model | notes = List.map curriedAnim model.notes }
+            --         , noteToJS note.tone_val
+            --         )
+            --     else
+            model ! []
 
         MouseLeave ->
-            ( { model | notes = List.map stopAnim model.notes }, stopNote "" )
+            -- ( { model | notes = List.map stopAnim model.notes }, stopNote "" )
+            model ! []
 
         MouseUp ->
-            ( { model
-                | mousedown = False
-                , notes = List.map stopAnim model.notes
-              }
-            , stopNote ""
-            )
+            -- ( { model
+            --     | mousedown = False
+            --     , notes = List.map stopAnim model.notes
+            --   }
+            -- , stopNote ""
+            -- )
+            model ! []
 
         -- Touch Events
         StartTouch note ->

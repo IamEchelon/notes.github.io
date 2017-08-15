@@ -15,7 +15,21 @@ const loadHtml = new HtmlWebpackPlugin({
 const extractPlugin = new ExtractTextPlugin({
   filename: 'main.css'
 })
-const uglify = new UglifyJSPlugin()
+const uglify = new UglifyJSPlugin({
+  minimize: true,
+  compressor: {
+    warnings: false
+  }
+  // mangle:  true
+})
+
+const prod = 'production'
+const dev = 'development'
+
+// determine build env
+const TARGET_ENV = process.env.npm_lifecycle_event === 'build' ? prod : dev
+const isDev = TARGET_ENV == dev
+const isProd = TARGET_ENV == prod
 
 // Main
 module.exports = env => {
@@ -70,7 +84,8 @@ module.exports = env => {
             }
           ]
         }
-      ]
+      ],
+      noParse: /\.elm$/
     },
 
     // Additional functionality
