@@ -89,7 +89,13 @@ module.exports = env => {
     },
 
     // Additional functionality
-    plugins: [loadHtml, hmr, extractPlugin, uglify],
+    plugins: [
+      loadHtml,
+      hmr,
+      extractPlugin,
+      uglify,
+      new webpack.NamedModulesPlugin()
+    ],
 
     // webserver object
     devServer: {

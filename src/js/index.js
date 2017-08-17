@@ -31,4 +31,13 @@ elmApp.ports.noteToJS.subscribe(triggerNote)
 elmApp.ports.stopNote.subscribe(stopNote)
 
 console.log('Initialized app')
-console.log(module.hot)
+
+// document.querySelectorAll('.htmlNote').forEach(note => {
+//   note.addEventListener('mousedown', event => {
+//     synth.triggerAttack(event.currentTarget.id)
+//   })
+
+//   note.addEventListener('mouseup', function(event) {
+//     synth.triggerRelease()
+//   })
+// })
