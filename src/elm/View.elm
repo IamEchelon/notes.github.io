@@ -40,7 +40,7 @@ modalButton model =
     button
         [ classList [ ( "is-active", model.modal ) ]
         , id "playButton"
-        , Events.onClick Clear
+        , Events.onClick ClearModal
         ]
         [ text "Start" ]
 
@@ -57,6 +57,7 @@ instrument model =
         ]
 
 
+keyboard : Model -> Html Msg
 keyboard model =
     div [ class "keyboard" ]
         [ div [ id "octave-1" ] [ htmlKeys model ]
@@ -153,7 +154,7 @@ logo =
     div
         [ class "logo" ]
         [ img
-            [ class "title", src "images/logo.png" ]
+            [ class "title", src "src/img/logo.png" ]
             []
         ]
 

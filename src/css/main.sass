@@ -1,9 +1,8 @@
 @import _functions
-@import bulma
+@import "~bulma"
 
 // Constants
 $panelColor: #D8D8D8
-
 $width: 150px
 $xspacing: 5px
 $spacer: $width / 2 + $xspacing
@@ -19,21 +18,13 @@ $half-x-spacing: $xspacing / 2
 
 
 // Shape Key Panel Styles
-
-
-
 .htmlKeys
 	width: 1100px
 	display: flex
 	flex-direction: row
 	flex-wrap: wrap-reverse	
 	padding-bottom: 150px
-	// padding-left: $width/3
 	margin: 40px auto 0
-	// margin-left: -170px
-
-#octave-1
-	// margin-top: 270px
 
 
 #octave-2
@@ -68,8 +59,8 @@ $half-x-spacing: $xspacing / 2
 	flex-direction: row
 	overflow-x: scroll
 
-// Transpot Panel Styles
 
+// Transpot Panel Styles
 .panel
 	background: $panelColor
 	height: 10%
@@ -82,7 +73,6 @@ $half-x-spacing: $xspacing / 2
 .selectSynth
 	.label 
 		user-select: none
-		// margin-bottom: 0px
 	
 	select
 		user-select: none
@@ -121,5 +111,4 @@ $half-x-spacing: $xspacing / 2
 	align-items: center
 	align-content: center
 
-// Mobile styles
        

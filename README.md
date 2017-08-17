@@ -10,14 +10,17 @@ built today using computer software and modern tools?
 - [x] Hide modal on desktop and fix height
 - [x] Replace Gulp with Brunch for streamlined build system
 - [x] Add Logo
-- [ ] Fix scroll positioning issue
-- [x] Add full key layout
-- [ ] Correct sound clipping issue
-- [ ] Setup grid switching for note view
-- [ ] Add settings to instruments
-- [ ] Create more instruments
-- [ ] Setup mobile styles and features
 - [x] Fix clip path to correct note overlap
-- [ ] Covert styles over to bulma where applicable ***in progess***
+- [x] Add full key layout
 - [x] modularize JS 
 - [x] Prevent text select on instruments
+- [ ] Create more instruments
+- [ ] Correct sound clipping issue
+- [ ] Find fix for Webpack styleloader errors on build with Node 6
+- [ ] Add loader for image folder on webpack build
+- [ ] Fix scroll positioning issue
+- [ ] Setup grid switching for note view
+- [ ] Add settings to instruments
+- [ ] Setup mobile styles and features
+- [ ] refactor Update.elm to clean up file.
+ 
